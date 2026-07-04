@@ -11,4 +11,7 @@ const router = express.Router();
 // POST /register - Handles new user signup
 router.post('/register', authController.register);
 
+// POST /login - Handles existing user signin
+router.post('/login', authController.login);
+
 module.exports = router;

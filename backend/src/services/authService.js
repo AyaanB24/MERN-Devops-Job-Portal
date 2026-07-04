@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const jwt = require('jsonwebtoken');
 
 /**
  * Registers a new user in the system.
@@ -42,6 +43,49 @@ const registerUser = async (userData) => {
   return sanitizedUser;
 };
 
+/**
+ * Authenticates a user with email and password.
+ * 
+ * @param {string} email - User's email.
+ * @param {string} password - User's plain password.
+ * @returns {Promise<Object>} - Object containing sanitized user details and JWT token.
+ * @throws {Error} - If user is not found, password is incorrect, or validation fails.
+ */
+const loginUser = async (email, password) => {
+  // 1. Find user by email (explicitly select password as it has select: false in schema)
+  const user = await User.findOne({ email }).select('+password');
+  if (!user) {
+    const error = new Error('Invalid email or password');
+    error.statusCode = 401;
+    throw error;
+  }
+
+  // 2. Compare entered password with hashed password
+  const isMatch = await user.comparePassword(password);
+  if (!isMatch) {
+    const error = new Error('Invalid email or password');
+    error.statusCode = 401;
+    throw error;
+  }
+
+  // 3. Generate JWT token
+  const token = jwt.sign(
+    { id: user._id, role: user.role },
+    process.env.JWT_SECRET || 'mySuperSecretKey',
+    { expiresIn: '1d' }
+  );
+
+  // 4. Return safe user data (exclude password)
+  const sanitizedUser = user.toObject();
+  delete sanitizedUser.password;
+
+  return {
+    user: sanitizedUser,
+    token,
+  };
+};
+
 module.exports = {
   registerUser,
+  loginUser,
 };
