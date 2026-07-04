@@ -71,7 +71,29 @@ const login = async (req, res, next) => {
   }
 };
 
+/**
+ * Handles HTTP requests for retrieving the authenticated user's profile.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ */
+const getProfile = async (req, res, next) => {
+  try {
+    // req.user has already been populated by the protect middleware
+    return res.status(200).json({
+      success: true,
+      message: 'Profile retrieved successfully',
+      data: req.user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
+  getProfile,
 };
+
