@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
-const User = require('./src/models/User');
-const Job = require('./src/models/Job');
-const SavedJob = require('./src/models/SavedJob');
+const User = require('../src/models/User');
+const Job = require('../src/models/Job');
+const SavedJob = require('../src/models/SavedJob');
 
 const test = async () => {
     try {

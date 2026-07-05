@@ -1,14 +1,16 @@
 const express = require("express");
 const cors = require("cors");
 
+const { notFound, errorHandler } = require("./middleware/errorMiddleware");
+
 const app = express();
 
-// Middleware
+// ── Core Middleware ───────────────────────────────────────────────────────────
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-// Health Check Route
+// ── Health Check ──────────────────────────────────────────────────────────────
 app.get("/", (req, res) => {
     res.status(200).json({
         success: true,
@@ -16,8 +18,13 @@ app.get("/", (req, res) => {
     });
 });
 
+// ── API Routes ────────────────────────────────────────────────────────────────
 const authRoutes = require("./routes/authRoutes");
 
 app.use("/api/auth", authRoutes);
 
-module.exports = app;
+// ── Error Handling (must be LAST) ─────────────────────────────────────────────
+app.use(notFound);      // 404 — catches any unmatched route
+app.use(errorHandler);  // handles all errors forwarded via next(err)
+
+module.exports = app;

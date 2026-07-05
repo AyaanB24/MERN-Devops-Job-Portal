@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const User = require('./src/models/User');
-const Company = require('./src/models/Company');
+const User = require('../src/models/User');
+const Company = require('../src/models/Company');
 
 const test = async () => {
     try {

@@ -108,7 +108,7 @@ Make a request to the protected profile route, passing the token in the `Authori
 
 ```bash
 curl -X GET http://localhost:5000/api/auth/profile \
-  -H "Authorization: Bearer YOUR_COPIED_TOKEN_HERE"
+      -H "Authorization: Bearer YOUR_COPIED_TOKEN_HERE"
 ```
 
 **Expected Response (`200 OK`):**

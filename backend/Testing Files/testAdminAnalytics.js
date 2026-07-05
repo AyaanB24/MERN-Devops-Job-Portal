@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 // Explicitly require all models referenced via populate() to register their schemas
-require('./src/models/Company');
-const { getDashboardAnalytics } = require('./src/services/adminService');
+require('../src/models/Company');
+const { getDashboardAnalytics } = require('../src/services/adminService');
 
 
 const test = async () => {
