@@ -7,7 +7,13 @@
 | 1 | Global Error Handler | ✅ Done |
 | 2 | Async Error Wrapper | ✅ Done |
 | 3 | Integrate Error Middleware | ✅ Done |
-| 4 | *(coming soon)* | 🔜 |
+| | | |
+| **12.5** | **Request Validation** | |
+| 4 | Auth Validators | ✅ Done |
+| 5 | Company Validators | ✅ Done |
+| 6 | Job Validators | ✅ Done |
+| 7 | Application Validators | 🔜 |
+| 8 | Validation Middleware (DRY) | ✅ Done |
 
 ---
 
@@ -201,5 +207,336 @@ GET http://localhost:5000/api/nonexistent-route
 { "success": false, "message": "Route not found: GET /api/nonexistent-route" }
 ```
 If you get this JSON (not an HTML Express error page), the middleware chain is wired correctly.
+
+---
+
+---
+
+# Phase 12.5: Request Validation
+
+## 📂 Folder Structure
+
+```
+backend/src/
+└── validators/
+    ├── authValidator.js          # register, login
+    ├── companyValidator.js        # create, update company
+    ├── jobValidator.js            # create, update job
+    └── applicationValidator.js    # apply, update status
+```
+
+Each validator file exports **middleware functions** that validate `req.body` / `req.params` before the request ever reaches the controller.
+
+---
+
+## ❓ Why Validation Should NOT Live Inside Controllers
+
+| Inside Controllers ❌ | Separate Validators ✅ |
+| :--- | :--- |
+| Controller does 2 jobs — validation + business logic | Single Responsibility: each layer has one job |
+| Duplicate checks across controllers (e.g., email format in register & update) | Reusable validators shared across routes |
+| Validation rules buried in business logic — hard to audit | All rules in one folder — easy to review & update |
+| Can't swap validation library without touching every controller | Swap Joi → Zod → express-validator in one place |
+| Error shapes vary per controller | Consistent `400` response structure from one handler |
+
+**Rule:** Controllers should assume input is already valid. If bad data reaches a controller, it's a validation bug, not a controller bug.
+
+---
+
+## 🏭 Industry Best Practices
+
+1. **Validate at the edge** — Validation middleware runs in the route file, before the controller. Bad requests are rejected immediately (no DB queries wasted).
+2. **Use a schema-based library** — Libraries like `express-validator` or `Joi` define rules declaratively rather than with manual `if` chains.
+3. **Return ALL errors at once** — Don't fail on the first bad field. Collect and return every validation error so the client can fix everything in one round-trip.
+4. **Separate validation from sanitization** — Validate format first, then sanitize (trim, escape) to prevent injection.
+5. **Keep validators stateless** — No DB lookups in validators. Uniqueness checks belong in the service/DB layer.
+
+---
+
+## ⚙️ How It Will Plug Into Routes
+
+```js
+// routes/authRoutes.js
+const { validateRegister, validateLogin } = require('../validators/authValidator');
+
+router.post('/register', validateRegister, authController.register);
+router.post('/login',    validateLogin,    authController.login);
+```
+
+Flow: **Request → Validator (rejects 400) → Controller (processes) → Service (DB) → Response**
+
+---
+
+## 🧪 Test Plan (Postman)
+
+Once validators are built, test each with these patterns:
+
+### Auth Validators
+| Test | Method & URL | Body | Expected |
+| :--- | :--- | :--- | :---: |
+| Missing all fields | `POST /api/auth/register` | `{}` | `400` + errors array |
+| Invalid email | `POST /api/auth/register` | `{ "email": "not-email" }` | `400` |
+| Short password | `POST /api/auth/register` | `{ "password": "12" }` | `400` |
+| Valid register | `POST /api/auth/register` | all fields correct | `201` |
+| Missing password on login | `POST /api/auth/login` | `{ "email": "a@b.com" }` | `400` |
+
+### Company Validators
+| Test | Method & URL | Body | Expected |
+| :--- | :--- | :--- | :---: |
+| Missing company name | `POST /api/companies` | `{}` | `400` |
+| Valid create | `POST /api/companies` | `{ "name": "Acme" }` | `201` |
+
+### Job Validators
+| Test | Method & URL | Body | Expected |
+| :--- | :--- | :--- | :---: |
+| Missing title/salary | `POST /api/jobs` | `{}` | `400` |
+| Invalid salary (negative) | `POST /api/jobs` | `{ "salary": -100 }` | `400` |
+| Valid create | `POST /api/jobs` | all required fields | `201` |
+
+### Application Validators
+| Test | Method & URL | Body | Expected |
+| :--- | :--- | :--- | :---: |
+| Invalid status value | `PUT /api/applications/:id/status` | `{ "status": "yolo" }` | `400` |
+| Valid status update | `PUT /api/applications/:id/status` | `{ "status": "accepted" }` | `200` |
+
+---
+
+---
+
+## ✅ Step 4 — Auth Validators
+
+**File:** `src/validators/authValidator.js`  
+**Dependency:** `express-validator` (installed)
+
+### What It Does
+Exports two middleware arrays — `validateRegister` and `validateLogin` — that run **before** the controller in the route chain.
+
+| Field | Register | Login | Rule | Security Reason |
+| :--- | :---: | :---: | :--- | :--- |
+| `name` | ✅ | — | 2–50 chars, trimmed, escaped | Prevents XSS via HTML injection in name |
+| `email` | ✅ | ✅ | Valid format, normalized | Blocks malformed input before DB unique check |
+| `password` | ✅ | ✅ | Min 6 chars (register), non-empty (login) | Resists brute-force; login just needs a value |
+| `role` | ✅ | — | Optional, whitelist: `candidate` / `recruiter` | **Blocks self-assigning `admin` role** |
+
+### Wire into Routes
+```js
+// routes/authRoutes.js
+const { validateRegister, validateLogin } = require('../validators/authValidator');
+
+router.post('/register', validateRegister, authController.register);
+router.post('/login',    validateLogin,    authController.login);
+```
+
+### 🧪 Test (Postman)
+
+**1 — Empty register body → 400 with all field errors**
+```
+POST http://localhost:5000/api/auth/register
+Body: {}
+```
+```json
+{
+  "success": false,
+  "message": "Validation failed. Please check the provided fields.",
+  "errors": [
+    { "field": "name",     "message": "Name is required" },
+    { "field": "email",    "message": "Email is required" },
+    { "field": "password", "message": "Password is required" }
+  ]
+}
+```
+
+**2 — Invalid email + short password → 400**
+```
+POST http://localhost:5000/api/auth/register
+Body: { "name": "Test", "email": "bad", "password": "12" }
+```
+```json
+{ "errors": [
+    { "field": "email",    "message": "Please provide a valid email address" },
+    { "field": "password", "message": "Password must be at least 6 characters" }
+]}
+```
+
+**3 — Privilege escalation attempt (role=admin) → 400**
+```
+POST http://localhost:5000/api/auth/register
+Body: { "name": "Hacker", "email": "h@x.com", "password": "123456", "role": "admin" }
+```
+```json
+{ "errors": [{ "field": "role", "message": "Role must be either candidate or recruiter" }] }
+```
+
+**4 — Empty login body → 400**
+```
+POST http://localhost:5000/api/auth/login
+Body: {}
+```
+```json
+{ "errors": [
+    { "field": "email",    "message": "Email is required" },
+    { "field": "password", "message": "Password is required" }
+]}
+```
+
+---
+
+---
+
+## ✅ Step 6 — Job Validators
+
+**File:** `src/validators/jobValidator.js`
+
+### What It Does
+Exports `validateCreateJob` (all fields required) and `validateUpdateJob` (all fields optional for partial updates).
+
+| Field | Create | Update | Rule | Why |
+| :--- | :---: | :---: | :--- | :--- |
+| `title` | ✅ | opt | 3–100 chars | Prevents meaningless 1-char titles |
+| `description` | ✅ | opt | 10–5000 chars | Forces meaningful listings |
+| `salary` | ✅ | opt | Numeric, ≥ 0 | Rejects negatives and strings like "$50k" |
+| `location` | ✅ | opt | 2–100 chars, trimmed | Blocks whitespace-only values |
+| `experience` | ✅ | opt | Whitelist enum | Matches schema: `0-1 years` … `10+ years` |
+| `jobType` | opt | opt | Whitelist enum | Matches schema: `Full-time` … `Remote` |
+
+> `company` and `createdBy` are set by the controller from auth context — never user-supplied.
+
+### Wire into Routes
+```js
+const { validateCreateJob, validateUpdateJob } = require('../validators/jobValidator');
+
+router.post('/',    protect, validateCreateJob,  jobController.createJob);
+router.put('/:id',  protect, validateUpdateJob,  jobController.updateJob);
+```
+
+### 🧪 Test (Postman)
+
+**1 — Empty create body → 400**
+```
+POST http://localhost:5000/api/jobs
+Headers: Authorization: Bearer <token>
+Body: {}
+```
+```json
+{ "success": false, "errors": [
+    { "field": "title",       "message": "Job title is required" },
+    { "field": "description", "message": "Job description is required" },
+    { "field": "salary",      "message": "Salary is required" },
+    { "field": "location",    "message": "Location is required" },
+    { "field": "experience",  "message": "Experience level is required" }
+]}
+```
+
+**2 — Negative salary + invalid experience → 400**
+```
+Body: { "title": "Dev", "description": "A valid desc here", "salary": -500, "location": "Delhi", "experience": "senior" }
+```
+```json
+{ "errors": [
+    { "field": "salary",     "message": "Salary must be a positive number" },
+    { "field": "experience", "message": "Experience must be one of: 0-1 years, ..." }
+]}
+```
+
+**3 — Partial update (only salary) → passes validation**
+```
+PUT http://localhost:5000/api/jobs/<jobId>
+Body: { "salary": 900000 }
+```
+Should proceed to controller (no 400) since all fields are optional on update.
+
+---
+
+---
+
+## ✅ Step 5 — Company Validators
+
+**File:** `src/validators/companyValidator.js`
+
+### What It Does
+Exports `validateCreateCompany` (name required) and `validateUpdateCompany` (all optional for partial updates).
+
+| Field | Create | Update | Rule | Why |
+| :--- | :---: | :---: | :--- | :--- |
+| `companyName` | ✅ | opt | 2–100 chars, trimmed | Prevents empty/single-char registrations |
+| `website` | opt | opt | Valid URL when provided | Blocks freeform text breaking frontend links |
+| `description` | opt | opt | Max 1000 chars | Matches schema limit, prevents oversized payloads |
+
+> `owner` is set by the controller from `req.user` — never user-supplied.
+
+### Wire into Routes
+```js
+const { validateCreateCompany, validateUpdateCompany } = require('../validators/companyValidator');
+
+router.post('/',    protect, validateCreateCompany,  companyController.createCompany);
+router.put('/:id',  protect, validateUpdateCompany,  companyController.updateCompany);
+```
+
+### 🧪 Test (Postman)
+
+**1 — Empty create body → 400**
+```
+POST http://localhost:5000/api/companies
+Headers: Authorization: Bearer <token>
+Body: {}
+```
+```json
+{ "success": false, "errors": [
+    { "field": "companyName", "message": "Company name is required" }
+]}
+```
+
+**2 — Invalid website URL → 400**
+```
+Body: { "companyName": "Acme Corp", "website": "not-a-url" }
+```
+```json
+{ "errors": [{ "field": "website", "message": "Please provide a valid website URL" }] }
+```
+
+**3 — Valid create → passes validation**
+```
+Body: { "companyName": "Acme Corp", "website": "https://acme.com", "description": "A great company" }
+```
+Should proceed to controller (no 400).
+
+---
+---
+
+---
+
+## ✅ Step 8 — Validation Middleware (DRY Refactor)
+
+**File:** `src/middleware/validationMiddleware.js`
+
+### What & Why
+Every validator file had its own copy of `handleValidationErrors` — identical 15-line function duplicated 3 times. This middleware centralizes it into one shared `validate` function.
+
+### Validation Lifecycle
+```
+Request
+  → body('email').isEmail()      [Phase 1 — collects errors silently]
+  → body('password').notEmpty()  [Phase 1 — collects errors silently]
+  → validate                    [Phase 2 — checks results, sends 400 or next()]
+  → controller                  [only reached if zero errors]
+```
+
+### What Changed
+| File | Before | After |
+| :--- | :--- | :--- |
+| `authValidator.js` | Inline `handleValidationErrors` | `import { validate }` |
+| `jobValidator.js` | Inline `handleValidationErrors` | `import { validate }` |
+| `companyValidator.js` | Inline `handleValidationErrors` | `import { validate }` |
+
+### 🧪 Test (Postman)
+Same tests as Steps 4–6 — responses should be **identical** since the logic is the same, just centralized. Quick sanity check:
+```
+POST http://localhost:5000/api/auth/register
+Body: {}
+```
+```json
+{ "success": false, "message": "Validation failed...", "errors": [...] }
+```
+If the 400 response shape is unchanged, the refactor is clean.
 
 ---
