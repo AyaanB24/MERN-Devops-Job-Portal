@@ -72,6 +72,14 @@ const jobSchema = new mongoose.Schema(
 // Compound text index to enable full-text search across title and description
 jobSchema.index({ title: 'text', description: 'text' });
 
+// Cascading delete: Automatically delete associated applications when a job is deleted
+jobSchema.pre('findOneAndDelete', async function(next) {
+  const Application = mongoose.model('Application');
+  const query = this.getQuery();
+  await Application.deleteMany({ job: query._id });
+  next();
+});
+
 const Job = mongoose.model('Job', jobSchema);
 
 module.exports = Job;
