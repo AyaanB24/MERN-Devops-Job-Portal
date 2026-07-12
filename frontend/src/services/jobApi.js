@@ -34,3 +34,9 @@ export const fetchJobById = async (id) => {
   const response = await apiClient.get(`/jobs/${id}`);
   return response.data;
 };
+
+// ── Recruiter Methods ────────────────────────────────────────────────────────
+export const createJob = async (jobData) => {
+  const response = await apiClient.post('/jobs', jobData);
+  return response.data;
+};

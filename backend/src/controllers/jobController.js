@@ -12,8 +12,11 @@ exports.getJobs = asyncHandler(async (req, res) => {
   const limit = parseInt(req.query.limit, 10) || 10;
   const skip = (page - 1) * limit;
 
-  const jobs = await Job.find().populate('company', 'companyName').skip(skip).limit(limit);
-  const total = await Job.countDocuments();
+  let query = {};
+  if (req.query.createdBy) query.createdBy = req.query.createdBy;
+
+  const jobs = await Job.find(query).populate('company', 'companyName').skip(skip).limit(limit);
+  const total = await Job.countDocuments(query);
   
   res.status(200).json({ 
     success: true, 

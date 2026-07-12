@@ -23,3 +23,15 @@ export const fetchApplications = async (params = {}) => {
   const response = await apiClient.get('/applications', { params });
   return response.data;
 };
+
+// ── Recruiter Methods ────────────────────────────────────────────────────────
+
+export const getJobApplicants = async (jobId) => {
+  const response = await apiClient.get(`/applications?job=${jobId}`);
+  return response.data;
+};
+
+export const updateApplicationStatus = async (id, status) => {
+  const response = await apiClient.put(`/applications/${id}/status`, { status });
+  return response.data;
+};

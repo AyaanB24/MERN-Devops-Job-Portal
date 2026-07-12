@@ -20,6 +20,13 @@ import CandidateDashboardPage from '../features/candidate/CandidateDashboardPage
 import CandidateProfilePage from '../features/profile/CandidateProfilePage';
 import ApplicationsPage from '../features/applications/ApplicationsPage';
 
+// Pages — Recruiter
+import RecruiterDashboardPage from '../features/recruiter/RecruiterDashboardPage';
+import CompanyManagementPage from '../features/company/CompanyManagementPage';
+import ManageJobsPage from '../features/jobs/ManageJobsPage';
+import CreateJobPage from '../features/jobs/CreateJobPage';
+import ViewApplicantsPage from '../features/applications/ViewApplicantsPage';
+
 // ─── Placeholder pages (built in later phases) ───────────────────────────────
 const Placeholder = ({ label }) => (
   <div className="flex items-center justify-center min-h-screen text-xl font-semibold text-gray-400">
@@ -61,11 +68,11 @@ const router = createBrowserRouter([
   {
     element: <ProtectedRoute allowedRoles={['recruiter']} />,
     children: [
-      { path: '/recruiter/dashboard', element: <Placeholder label="Recruiter Dashboard" /> },
-      { path: '/recruiter/company', element: <Placeholder label="Company Profile" /> },
-      { path: '/recruiter/jobs/manage', element: <Placeholder label="Manage Jobs" /> },
-      { path: '/recruiter/jobs/create', element: <Placeholder label="Create Job" /> },
-      { path: '/recruiter/jobs/:id/applicants', element: <Placeholder label="Applicants" /> },
+      { path: '/recruiter/dashboard', element: <RecruiterDashboardPage /> },
+      { path: '/recruiter/company', element: <CompanyManagementPage /> },
+      { path: '/recruiter/jobs/manage', element: <ManageJobsPage /> },
+      { path: '/recruiter/jobs/create', element: <CreateJobPage /> },
+      { path: '/recruiter/jobs/:id/applicants', element: <ViewApplicantsPage /> },
     ],
   },
 

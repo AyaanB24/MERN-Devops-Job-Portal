@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getJobs, getJobById } from './jobService';
+import { getJobs, getJobById, createJob } from './jobService';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ASYNC THUNKS
@@ -24,6 +24,21 @@ export const fetchJobsList = createAsyncThunk(
 );
 
 /**
+ * Fetches jobs created by the logged-in recruiter.
+ */
+export const fetchRecruiterJobs = createAsyncThunk(
+  'jobs/fetchRecruiterJobs',
+  async ({ page = 1, limit = 10 } = {}, { getState, rejectWithValue }) => {
+    try {
+      const recruiterId = getState().auth.user._id;
+      return await getJobs({ filters: { createdBy: recruiterId }, page, limit });
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch your jobs');
+    }
+  }
+);
+
+/**
  * Fetches a single job by ID for the detail page.
  */
 export const fetchJobDetail = createAsyncThunk(
@@ -37,11 +52,22 @@ export const fetchJobDetail = createAsyncThunk(
   }
 );
 
+/**
+ * Creates a new job posting.
+ */
+export const createNewJob = createAsyncThunk(
+  'jobs/createNewJob',
+  async (jobData, { rejectWithValue }) => {
+    try {
+      return await createJob(jobData);
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to create job');
+    }
+  }
+);
+
 // ─────────────────────────────────────────────────────────────────────────────
 // INITIAL STATE
-// Matches backend response shape exactly:
-//   GET /api/jobs → { data: Job[], pagination: { page, totalPages } }
-//   GET /api/jobs/:id → { data: Job }
 // ─────────────────────────────────────────────────────────────────────────────
 const initialState = {
   // Job list
@@ -53,6 +79,10 @@ const initialState = {
   currentJob: null,
   detailStatus: 'idle',
   detailError: null,
+
+  // Create Job
+  createStatus: 'idle',
+  createError: null,
 
   // Filters — stored in Redux so navigating back restores search state
   filters: {
@@ -75,45 +105,52 @@ const jobSlice = createSlice({
   name: 'jobs',
   initialState,
   reducers: {
-    // Update a single filter field and reset to page 1
     setFilter(state, action) {
       const { key, value } = action.payload; // { key: 'keyword', value: 'react' }
       state.filters[key] = value;
       state.pagination.currentPage = 1;
     },
-    // Reset all filters and pagination
     clearFilters(state) {
       state.filters = initialState.filters;
       state.pagination = initialState.pagination;
     },
-    // Navigate to a specific page
     setPage(state, action) {
       state.pagination.currentPage = action.payload;
     },
-    // Clear detail when leaving the detail page to avoid stale data flash
     clearCurrentJob(state) {
       state.currentJob = null;
       state.detailStatus = 'idle';
       state.detailError = null;
     },
+    clearCreateJobState(state) {
+      state.createStatus = 'idle';
+      state.createError = null;
+    },
   },
   extraReducers: (builder) => {
-    // ── Fetch Job List ────────────────────────────────────────────────────
+    // ── Fetch Job List & Recruiter Jobs ─────────────────────────────────────
+    const handleFetchListPending = (state) => {
+      state.listStatus = 'loading';
+      state.listError = null;
+    };
+    const handleFetchListFulfilled = (state, action) => {
+      state.listStatus = 'succeeded';
+      state.jobs = action.payload.data;
+      state.pagination.currentPage = action.payload.pagination.page;
+      state.pagination.totalPages = action.payload.pagination.totalPages;
+    };
+    const handleFetchListRejected = (state, action) => {
+      state.listStatus = 'failed';
+      state.listError = action.payload;
+    };
+
     builder
-      .addCase(fetchJobsList.pending, (state) => {
-        state.listStatus = 'loading';
-        state.listError = null;
-      })
-      .addCase(fetchJobsList.fulfilled, (state, action) => {
-        state.listStatus = 'succeeded';
-        state.jobs = action.payload.data;
-        state.pagination.currentPage = action.payload.pagination.page;
-        state.pagination.totalPages = action.payload.pagination.totalPages;
-      })
-      .addCase(fetchJobsList.rejected, (state, action) => {
-        state.listStatus = 'failed';
-        state.listError = action.payload;
-      });
+      .addCase(fetchJobsList.pending, handleFetchListPending)
+      .addCase(fetchJobsList.fulfilled, handleFetchListFulfilled)
+      .addCase(fetchJobsList.rejected, handleFetchListRejected)
+      .addCase(fetchRecruiterJobs.pending, handleFetchListPending)
+      .addCase(fetchRecruiterJobs.fulfilled, handleFetchListFulfilled)
+      .addCase(fetchRecruiterJobs.rejected, handleFetchListRejected);
 
     // ── Fetch Job Detail ──────────────────────────────────────────────────
     builder
@@ -130,10 +167,25 @@ const jobSlice = createSlice({
         state.detailStatus = 'failed';
         state.detailError = action.payload;
       });
+
+    // ── Create Job ────────────────────────────────────────────────────────
+    builder
+      .addCase(createNewJob.pending, (state) => {
+        state.createStatus = 'loading';
+        state.createError = null;
+      })
+      .addCase(createNewJob.fulfilled, (state, action) => {
+        state.createStatus = 'succeeded';
+        state.jobs.unshift(action.payload.data); // Optionally add to top of list
+      })
+      .addCase(createNewJob.rejected, (state, action) => {
+        state.createStatus = 'failed';
+        state.createError = action.payload;
+      });
   },
 });
 
-export const { setFilter, clearFilters, setPage, clearCurrentJob } = jobSlice.actions;
+export const { setFilter, clearFilters, setPage, clearCurrentJob, clearCreateJobState } = jobSlice.actions;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SELECTORS
@@ -144,7 +196,10 @@ export const selectJobListError = (state) => state.jobs.listError;
 export const selectCurrentJob = (state) => state.jobs.currentJob;
 export const selectJobDetailStatus = (state) => state.jobs.detailStatus;
 export const selectJobDetailError = (state) => state.jobs.detailError;
+export const selectCreateJobStatus = (state) => state.jobs.createStatus;
+export const selectCreateJobError = (state) => state.jobs.createError;
 export const selectFilters = (state) => state.jobs.filters;
 export const selectPagination = (state) => state.jobs.pagination;
 
 export default jobSlice.reducer;
+

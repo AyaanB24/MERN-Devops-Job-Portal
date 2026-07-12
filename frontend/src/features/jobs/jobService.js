@@ -1,4 +1,4 @@
-import { fetchJobs, fetchJobById } from '../../services/jobApi';
+import { fetchJobs, fetchJobById, createJob as apiCreateJob } from '../../services/jobApi';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Job Service — orchestration layer between jobSlice and jobApi.
@@ -31,3 +31,8 @@ export const getJobs = async ({ filters = {}, page = 1, limit = 10 }) => {
 export const getJobById = async (id) => {
   return fetchJobById(id);
 };
+
+export const createJob = async (jobData) => {
+  return apiCreateJob(jobData);
+};
+
