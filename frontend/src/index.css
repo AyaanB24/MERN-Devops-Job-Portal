@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+/* =========================================
+   DESIGN TOKENS — Job Portal
+   ========================================= */
+:root {
+  --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
+  --color-secondary: #06b6d4;
+  --color-destructive: #ef4444;
+  --color-muted: #6b7280;
+  --color-bg: #f9fafb;
+  --color-surface: #ffffff;
+  --color-border: #e5e7eb;
+  --color-text: #111827;
+  --color-text-muted: #6b7280;
+  --radius: 0.5rem;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+/* Base reset */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', 'Outfit', system-ui, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  margin: 0;
+}
