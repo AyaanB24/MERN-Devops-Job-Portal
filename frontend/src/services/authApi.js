@@ -36,3 +36,29 @@ export const getProfile = async () => {
   const response = await apiClient.get('/auth/profile');
   return response.data;
 };
+
+/**
+ * PUT /api/auth/profile
+ * Updates authenticated user profile details (bio, skills, etc.)
+ * @param {Object} profileData
+ * @returns {Object} - { success, data: User }
+ */
+export const updateUserProfile = async (profileData) => {
+  const response = await apiClient.put('/auth/profile', profileData);
+  return response.data;
+};
+
+/**
+ * POST /api/auth/profile/resume
+ * Uploads user resume PDF file (multipart form data)
+ * @param {FormData} formData
+ * @returns {Object} - { success, message, file: { filename, path, size } }
+ */
+export const uploadUserResume = async (formData) => {
+  const response = await apiClient.post('/auth/profile/resume', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};

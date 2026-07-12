@@ -91,9 +91,32 @@ const getProfile = async (req, res, next) => {
   }
 };
 
+const userService = require('../services/userService');
+
+/**
+ * Handles HTTP requests for updating the authenticated user's profile.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ */
+const updateProfile = async (req, res, next) => {
+  try {
+    const updatedUser = await userService.updateProfile(req.user.id, req.body);
+    return res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      data: updatedUser,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
   getProfile,
+  updateProfile,
 };
 

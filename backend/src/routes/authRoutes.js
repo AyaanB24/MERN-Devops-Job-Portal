@@ -20,6 +20,9 @@ router.post('/login', authController.login);
 // GET /profile - Retrieves authenticated user profile
 router.get('/profile', protect, authController.getProfile);
 
+// PUT /profile - Updates authenticated user profile
+router.put('/profile', protect, authController.updateProfile);
+
 // GET /admin-only - Test route for Admin role only
 router.get('/admin-only', protect, authorize('admin'), (req, res) => {
   res.status(200).json({

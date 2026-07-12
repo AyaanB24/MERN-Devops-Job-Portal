@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { loginUser, registerUser, getProfile } from '../../services/authApi';
+import { loginUser, registerUser, getProfile, updateUserProfile, uploadUserResume } from '../../services/authApi';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ASYNC THUNKS
@@ -46,6 +46,32 @@ export const loadUserFromToken = createAsyncThunk(
     } catch (error) {
       localStorage.removeItem('token'); // Token is stale — clean up
       return rejectWithValue('Session expired');
+    }
+  }
+);
+
+// Updates profile details (bio, skills, etc.)
+export const updateProfile = createAsyncThunk(
+  'auth/updateProfile',
+  async (profileData, { rejectWithValue }) => {
+    try {
+      const data = await updateUserProfile(profileData);
+      return data; // { success, data: User }
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Profile update failed');
+    }
+  }
+);
+
+// Uploads resume PDF
+export const uploadResume = createAsyncThunk(
+  'auth/uploadResume',
+  async (formData, { rejectWithValue }) => {
+    try {
+      const data = await uploadUserResume(formData);
+      return data; // { success, message, file }
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Resume upload failed');
     }
   }
 );
@@ -131,6 +157,38 @@ const authSlice = createSlice({
       .addCase(loadUserFromToken.rejected, (state) => {
         state.status = 'idle'; // Silently fail — user just needs to log in
         state.isAuthenticated = false;
+      });
+
+    // ── Update Profile ─────────────────────────────────────────────────────
+    builder
+      .addCase(updateProfile.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.user = action.payload.data; // Server returns { success, data: updatedUser }
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+      });
+
+    // ── Upload Resume ──────────────────────────────────────────────────────
+    builder
+      .addCase(uploadResume.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(uploadResume.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        if (state.user) {
+          state.user.resume = action.payload.file.path; // Update resume path in state
+        }
+      })
+      .addCase(uploadResume.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
       });
   },
 });

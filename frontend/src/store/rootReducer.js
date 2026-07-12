@@ -1,4 +1,6 @@
 import authReducer from '../features/auth/authSlice';
+import jobReducer from '../features/jobs/jobSlice';
+import applicationReducer from '../features/applications/applicationSlice';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Root Reducer — central registry for all Redux slices.
@@ -6,8 +8,8 @@ import authReducer from '../features/auth/authSlice';
 // ─────────────────────────────────────────────────────────────────────────────
 const rootReducer = {
   auth: authReducer,
-  // jobs: jobReducer,         ← plug in as features are built
-  // applications: applicationReducer,
+  jobs: jobReducer,
+  applications: applicationReducer,
   // company: companyReducer,
   // admin: adminReducer,
   // ui: uiReducer,
