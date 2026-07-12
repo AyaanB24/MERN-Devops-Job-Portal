@@ -48,11 +48,11 @@ exports.deleteJob = asyncHandler(async (req, res) => {
   const job = await Job.findById(req.params.id);
   if (!job) return res.status(404).json({ success: false, message: 'Job not found' });
   
-  // IDOR Protection: only the owner can delete
-  if (job.createdBy.toString() !== req.user.id) {
+  // IDOR Protection: only the owner or an admin can delete
+  if (job.createdBy.toString() !== req.user.id && req.user.role !== 'admin') {
     return res.status(403).json({ success: false, message: 'Not authorized to delete this job' });
   }
   
-  await Job.findOneAndDelete({ _id: req.params.id }); // This triggers the Mongoose hook we added earlier
+  await Job.findOneAndDelete({ _id: req.params.id });
   res.status(200).json({ success: true, message: 'Job deleted' });
 });

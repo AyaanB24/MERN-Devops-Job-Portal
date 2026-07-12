@@ -27,6 +27,11 @@ import ManageJobsPage from '../features/jobs/ManageJobsPage';
 import CreateJobPage from '../features/jobs/CreateJobPage';
 import ViewApplicantsPage from '../features/applications/ViewApplicantsPage';
 
+// Pages — Admin
+import AdminDashboardPage from '../features/admin/AdminDashboardPage';
+import AdminUserManagementPage from '../features/admin/AdminUserManagementPage';
+import AdminJobManagementPage from '../features/admin/AdminJobManagementPage';
+
 // ─── Placeholder pages (built in later phases) ───────────────────────────────
 const Placeholder = ({ label }) => (
   <div className="flex items-center justify-center min-h-screen text-xl font-semibold text-gray-400">
@@ -80,9 +85,9 @@ const router = createBrowserRouter([
   {
     element: <ProtectedRoute allowedRoles={['admin']} />,
     children: [
-      { path: '/admin/dashboard', element: <Placeholder label="Admin Dashboard" /> },
-      { path: '/admin/users', element: <Placeholder label="User Management" /> },
-      { path: '/admin/jobs', element: <Placeholder label="Job Moderation" /> },
+      { path: '/admin/dashboard', element: <AdminDashboardPage /> },
+      { path: '/admin/users', element: <AdminUserManagementPage /> },
+      { path: '/admin/jobs', element: <AdminJobManagementPage /> },
     ],
   },
 ]);

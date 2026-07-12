@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
 import {
   fetchJobApplicants,
   updateApplicantStatus,
@@ -38,7 +39,12 @@ const ViewApplicantsPage = () => {
   }, [dispatch, jobId]);
 
   const handleStatusUpdate = async (appId, newStatus) => {
-    await dispatch(updateApplicantStatus({ id: appId, status: newStatus }));
+    const result = await dispatch(updateApplicantStatus({ id: appId, status: newStatus }));
+    if (updateApplicantStatus.fulfilled.match(result)) {
+      toast.success(`Applicant ${newStatus} successfully!`);
+    } else {
+      toast.error(result.payload || 'Failed to update applicant');
+    }
   };
 
   const isLoading = listStatus === 'loading';

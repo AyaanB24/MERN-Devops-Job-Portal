@@ -12,6 +12,6 @@ router.route('/')
 router.route('/:id')
   .get(getJobById) // Public route
   .put(protect, authorize('recruiter'), updateJob)
-  .delete(protect, authorize('recruiter'), deleteJob);
+  .delete(protect, authorize('recruiter', 'admin'), deleteJob);
 
 module.exports = router;

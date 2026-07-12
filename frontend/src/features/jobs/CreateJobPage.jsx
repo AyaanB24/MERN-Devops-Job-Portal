@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import {
   createNewJob,
   clearCreateJobState,
@@ -49,7 +50,7 @@ const CreateJobPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!company) {
-      alert('You must create a company profile first!');
+      toast.error('You must create a company profile first!');
       navigate('/recruiter/company');
       return;
     }
@@ -63,7 +64,10 @@ const CreateJobPage = () => {
 
     const result = await dispatch(createNewJob(payload));
     if (createNewJob.fulfilled.match(result)) {
+      toast.success('Job posted successfully!');
       navigate('/recruiter/jobs/manage');
+    } else {
+      toast.error(result.payload || 'Failed to post job');
     }
   };
 
