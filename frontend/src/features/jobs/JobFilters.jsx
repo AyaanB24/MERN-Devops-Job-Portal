@@ -6,21 +6,15 @@ import {
   fetchJobsList,
   selectFilters,
 } from './jobSlice';
+import { JOB_TYPES } from '../../config/constants';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// JobFilters — Search and filter panel.
-// Dispatches setFilter to Redux on change, then triggers a fresh API fetch.
-// jobType values must match backend Job model enum exactly.
+// JobFilters — Search and filter panel
 // ─────────────────────────────────────────────────────────────────────────────
-
-const JOB_TYPES = ['Full-time', 'Part-time', 'Contract', 'Internship', 'Remote'];
 
 const JobFilters = () => {
   const dispatch = useDispatch();
   const filters = useSelector(selectFilters);
-
-  // Local state for keyword input — avoids an API call on every keystroke.
-  // API is triggered on form submit or Enter key only.
   const [localKeyword, setLocalKeyword] = useState(filters.keyword);
 
   const handleKeywordSubmit = (e) => {
@@ -38,7 +32,6 @@ const JobFilters = () => {
     dispatch(setFilter({ key: 'location', value: e.target.value }));
   };
 
-  // Trigger location search on Enter key
   const handleLocationKeyDown = (e) => {
     if (e.key === 'Enter') {
       dispatch(fetchJobsList({ page: 1 }));
@@ -51,18 +44,17 @@ const JobFilters = () => {
     dispatch(fetchJobsList({ filters: {}, page: 1 }));
   };
 
-  const hasActiveFilters =
-    filters.keyword || filters.location || filters.jobType;
+  const hasActiveFilters = filters.keyword || filters.location || filters.jobType;
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-      <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wide">
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <h3 className="text-sm font-semibold text-slate-700 mb-4 uppercase tracking-wide">
         Search & Filter
       </h3>
 
       {/* Keyword Search */}
       <form onSubmit={handleKeywordSubmit} className="mb-4">
-        <label htmlFor="keyword" className="block text-xs text-gray-500 mb-1">
+        <label htmlFor="keyword" className="block text-xs text-slate-500 mb-1">
           Keyword / Job Title
         </label>
         <div className="flex gap-2">
@@ -72,11 +64,11 @@ const JobFilters = () => {
             value={localKeyword}
             onChange={(e) => setLocalKeyword(e.target.value)}
             placeholder="e.g. React Developer"
-            className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             type="submit"
-            className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition"
+            className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
           >
             Search
           </button>
@@ -85,7 +77,7 @@ const JobFilters = () => {
 
       {/* Location */}
       <div className="mb-4">
-        <label htmlFor="location" className="block text-xs text-gray-500 mb-1">
+        <label htmlFor="location" className="block text-xs text-slate-500 mb-1">
           Location
         </label>
         <input
@@ -95,26 +87,24 @@ const JobFilters = () => {
           onChange={handleLocationChange}
           onKeyDown={handleLocationKeyDown}
           placeholder="e.g. Mumbai, Remote"
-          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
       {/* Job Type */}
       <div className="mb-4">
-        <label htmlFor="jobType" className="block text-xs text-gray-500 mb-1">
+        <label htmlFor="jobType" className="block text-xs text-slate-500 mb-1">
           Job Type
         </label>
         <select
           id="jobType"
           value={filters.jobType}
           onChange={handleJobTypeChange}
-          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">All Types</option>
           {JOB_TYPES.map((type) => (
-            <option key={type} value={type}>
-              {type}
-            </option>
+            <option key={type} value={type}>{type}</option>
           ))}
         </select>
       </div>
@@ -123,7 +113,7 @@ const JobFilters = () => {
       {hasActiveFilters && (
         <button
           onClick={handleClear}
-          className="w-full py-2 text-sm text-red-500 border border-red-200 rounded-lg hover:bg-red-50 transition"
+          className="w-full py-2 text-sm text-red-500 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
         >
           Clear Filters
         </button>

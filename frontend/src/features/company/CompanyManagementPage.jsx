@@ -28,14 +28,12 @@ const CompanyManagementPage = () => {
   });
   const [successMsg, setSuccessMsg] = useState('');
 
-  // Fetch company on mount
   useEffect(() => {
     if (status === 'idle') {
       dispatch(fetchMyCompany());
     }
   }, [dispatch, status]);
 
-  // Populate form when company data is loaded
   useEffect(() => {
     if (company) {
       setFormData({
@@ -46,7 +44,6 @@ const CompanyManagementPage = () => {
     }
   }, [company]);
 
-  // Clear errors on unmount
   useEffect(() => {
     return () => { dispatch(clearCompanyState()); };
   }, [dispatch]);
@@ -69,13 +66,12 @@ const CompanyManagementPage = () => {
   const isSaving = saveStatus === 'loading';
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">Company Profile</h1>
-      <p className="text-sm text-gray-500 mb-8">Manage your company details to attract top candidates.</p>
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <h1 className="text-2xl font-bold text-slate-900 mb-2">Company Profile</h1>
+      <p className="text-sm text-slate-500 mb-8">Manage your company details to attract top candidates.</p>
 
-      {/* Success / Error Banners */}
       {successMsg && (
-        <div className="mb-4 p-3 rounded-lg bg-green-50 border border-green-200 text-sm text-green-700">
+        <div className="mb-4 p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-sm text-emerald-700">
           {successMsg}
         </div>
       )}
@@ -87,15 +83,15 @@ const CompanyManagementPage = () => {
 
       {isLoading ? (
         <div className="animate-pulse space-y-4">
-          <div className="h-10 bg-gray-200 rounded w-full" />
-          <div className="h-32 bg-gray-200 rounded w-full" />
-          <div className="h-10 bg-gray-200 rounded w-full" />
+          <div className="h-10 bg-slate-200 rounded w-full" />
+          <div className="h-32 bg-slate-200 rounded w-full" />
+          <div className="h-10 bg-slate-200 rounded w-full" />
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="companyName" className="block text-sm font-medium text-slate-700 mb-1">
                 Company Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -106,14 +102,12 @@ const CompanyManagementPage = () => {
                 value={formData.companyName}
                 onChange={handleChange}
                 placeholder="e.g. Acme Corp"
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
               />
             </div>
 
             <div>
-              <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-1">
-                Website
-              </label>
+              <label htmlFor="website" className="block text-sm font-medium text-slate-700 mb-1">Website</label>
               <input
                 id="website"
                 name="website"
@@ -121,14 +115,12 @@ const CompanyManagementPage = () => {
                 value={formData.website}
                 onChange={handleChange}
                 placeholder="https://acmecorp.com"
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
               />
             </div>
 
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                Company Description
-              </label>
+              <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-1">Company Description</label>
               <textarea
                 id="description"
                 name="description"
@@ -137,15 +129,15 @@ const CompanyManagementPage = () => {
                 value={formData.description}
                 onChange={handleChange}
                 placeholder="Tell candidates about your company's mission and culture..."
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition resize-none"
+                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
               />
-              <p className="mt-1 text-xs text-gray-400 text-right">{formData.description.length}/1000</p>
+              <p className="mt-1 text-xs text-slate-400 text-right">{formData.description.length}/1000</p>
             </div>
 
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full sm:w-auto px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition"
+              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition-colors"
             >
               {isSaving ? 'Saving…' : 'Save Company Profile'}
             </button>

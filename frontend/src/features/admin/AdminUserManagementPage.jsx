@@ -11,14 +11,19 @@ import {
   selectUserPagination,
   selectDeleteStatus,
 } from './adminSlice';
+import { ROLE_COLORS } from '../../config/constants';
+import { formatDate } from '../../utils/formatDate';
+import Avatar from '../../components/ui/Avatar';
+import Button from '../../components/ui/Button';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // AdminUserManagementPage — View and remove users
+// Wrapped by DashboardLayout (Sidebar + TopHeader).
 // ─────────────────────────────────────────────────────────────────────────────
 
 const AdminUserManagementPage = () => {
   const dispatch = useDispatch();
-  
+
   const users = useSelector(selectUsers);
   const status = useSelector(selectUsersStatus);
   const error = useSelector(selectUsersError);
@@ -48,10 +53,10 @@ const AdminUserManagementPage = () => {
   const isLoading = status === 'loading';
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
-        <p className="text-sm text-gray-500 mt-1">View and manage all registered users.</p>
+        <h1 className="text-2xl font-bold text-slate-900">User Management</h1>
+        <p className="text-sm text-slate-500 mt-1">View and manage all registered users.</p>
       </div>
 
       {error && (
@@ -63,14 +68,14 @@ const AdminUserManagementPage = () => {
       {isLoading ? (
         <div className="space-y-4 animate-pulse">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-16 bg-gray-100 rounded-xl w-full" />
+            <div key={i} className="h-16 bg-slate-100 rounded-xl w-full" />
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-gray-600">
-              <thead className="bg-gray-50 text-gray-500 border-b border-gray-100 text-xs uppercase font-semibold">
+            <table className="w-full text-left text-sm text-slate-600">
+              <thead className="bg-slate-50 text-slate-500 border-b border-slate-100 text-xs uppercase font-semibold">
                 <tr>
                   <th className="px-6 py-4">Name</th>
                   <th className="px-6 py-4">Email</th>
@@ -79,32 +84,34 @@ const AdminUserManagementPage = () => {
                   <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-slate-100">
                 {users.map((u) => (
-                  <tr key={u._id} className="hover:bg-gray-50 transition">
-                    <td className="px-6 py-4 font-medium text-gray-900">{u.name}</td>
+                  <tr key={u._id} className="hover:bg-slate-50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <Avatar name={u.name} size="sm" />
+                        <span className="font-medium text-slate-900">{u.name}</span>
+                      </div>
+                    </td>
                     <td className="px-6 py-4">{u.email}</td>
                     <td className="px-6 py-4">
-                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider
-                        ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' :
-                          u.role === 'recruiter' ? 'bg-blue-100 text-blue-700' :
-                          'bg-emerald-100 text-emerald-700'}`}
-                      >
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${ROLE_COLORS[u.role] || ROLE_COLORS.candidate}`}>
                         {u.role}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-xs text-gray-400">
-                      {new Date(u.createdAt).toLocaleDateString()}
+                    <td className="px-6 py-4 text-xs text-slate-400">
+                      {formatDate(u.createdAt)}
                     </td>
                     <td className="px-6 py-4 text-right">
                       {u.role !== 'admin' && (
-                        <button
-                          disabled={deleteStatus === 'loading'}
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          loading={deleteStatus === 'loading'}
                           onClick={() => handleDelete(u._id)}
-                          className="text-red-500 hover:text-red-700 font-semibold text-xs disabled:opacity-50"
                         >
                           Delete
-                        </button>
+                        </Button>
                       )}
                     </td>
                   </tr>
@@ -112,27 +119,29 @@ const AdminUserManagementPage = () => {
               </tbody>
             </table>
           </div>
-          
+
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
-              <button
+            <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <Button
+                variant="outline"
+                size="sm"
                 disabled={page <= 1}
                 onClick={() => handlePageChange(page - 1)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50"
               >
                 Previous
-              </button>
-              <span className="text-sm text-gray-500">
+              </Button>
+              <span className="text-sm text-slate-500">
                 Page {page} of {totalPages}
               </span>
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 disabled={page >= totalPages}
                 onClick={() => handlePageChange(page + 1)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50"
               >
                 Next
-              </button>
+              </Button>
             </div>
           )}
         </div>

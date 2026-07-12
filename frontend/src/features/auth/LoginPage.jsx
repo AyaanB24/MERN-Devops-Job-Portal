@@ -27,12 +27,10 @@ const LoginPage = () => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const role = useSelector(selectUserRole);
 
-  // Preserve intended destination if redirected from a protected route
   const from = location.state?.from?.pathname;
 
   const [formData, setFormData] = useState({ email: '', password: '' });
 
-  // Redirect on successful login
   useEffect(() => {
     if (isAuthenticated && role) {
       const destination = from || ROLE_DASHBOARD[role] || '/';
@@ -40,7 +38,6 @@ const LoginPage = () => {
     }
   }, [isAuthenticated, role, navigate, from]);
 
-  // Clear any stale error when component mounts
   useEffect(() => {
     dispatch(clearError());
   }, [dispatch]);
@@ -58,25 +55,22 @@ const LoginPage = () => {
   const isLoading = status === 'loading';
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-md p-8">
-        {/* Header */}
+    <div className="w-full max-w-md mx-auto">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Welcome back</h1>
-          <p className="mt-2 text-sm text-gray-500">Sign in to your Job Portal account</p>
+          <h1 className="text-2xl font-bold text-slate-900">Welcome back</h1>
+          <p className="mt-2 text-sm text-slate-500">Sign in to your Job Portal account</p>
         </div>
 
-        {/* Error Banner */}
         {error && (
           <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-600">
             {error}
           </div>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} noValidate className="space-y-5">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
               Email address
             </label>
             <input
@@ -88,12 +82,12 @@ const LoginPage = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder="you@example.com"
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">
               Password
             </label>
             <input
@@ -105,23 +99,22 @@ const LoginPage = () => {
               value={formData.password}
               onChange={handleChange}
               placeholder="••••••••"
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
             />
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition"
+            className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition-colors"
           >
             {isLoading ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
 
-        {/* Footer */}
-        <p className="mt-6 text-center text-sm text-gray-500">
+        <p className="mt-6 text-center text-sm text-slate-500">
           Don&apos;t have an account?{' '}
-          <Link to="/register" className="font-medium text-indigo-600 hover:underline">
+          <Link to="/register" className="font-medium text-blue-600 hover:underline">
             Create one
           </Link>
         </p>

@@ -4,6 +4,11 @@ import { createBrowserRouter } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import GuestRoute from './GuestRoute';
 
+// Layouts
+import PublicLayout from '../layouts/PublicLayout';
+import DashboardLayout from '../layouts/DashboardLayout';
+import AuthLayout from '../layouts/AuthLayout';
+
 // Pages — Auth
 import LoginPage from '../features/auth/LoginPage';
 import RegisterPage from '../features/auth/RegisterPage';
@@ -32,30 +37,32 @@ import AdminDashboardPage from '../features/admin/AdminDashboardPage';
 import AdminUserManagementPage from '../features/admin/AdminUserManagementPage';
 import AdminJobManagementPage from '../features/admin/AdminJobManagementPage';
 
-// ─── Placeholder pages (built in later phases) ───────────────────────────────
-const Placeholder = ({ label }) => (
-  <div className="flex items-center justify-center min-h-screen text-xl font-semibold text-gray-400">
-    {label} — Coming soon
-  </div>
-);
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Route tree
 // ─────────────────────────────────────────────────────────────────────────────
 const router = createBrowserRouter([
-  // ── Public routes ──────────────────────────────────────────────────────
-  { path: '/', element: <HomePage /> },
-  { path: '/jobs', element: <JobListPage /> },
-  { path: '/jobs/:id', element: <JobDetailPage /> },
-  { path: '/unauthorized', element: <UnauthorizedPage /> },
-  { path: '*', element: <NotFoundPage /> },
+  // ── Public routes (Navbar + Footer) ────────────────────────────────────
+  {
+    element: <PublicLayout />,
+    children: [
+      { path: '/', element: <HomePage /> },
+      { path: '/jobs', element: <JobListPage /> },
+      { path: '/jobs/:id', element: <JobDetailPage /> },
+      { path: '/unauthorized', element: <UnauthorizedPage /> },
+    ],
+  },
 
   // ── Guest-only routes (login / register) ───────────────────────────────
   {
     element: <GuestRoute />,
     children: [
-      { path: '/login', element: <LoginPage /> },
-      { path: '/register', element: <RegisterPage /> },
+      {
+        element: <AuthLayout />,
+        children: [
+          { path: '/login', element: <LoginPage /> },
+          { path: '/register', element: <RegisterPage /> },
+        ],
+      },
     ],
   },
 
@@ -63,9 +70,14 @@ const router = createBrowserRouter([
   {
     element: <ProtectedRoute allowedRoles={['candidate']} />,
     children: [
-      { path: '/candidate/dashboard', element: <CandidateDashboardPage /> },
-      { path: '/candidate/profile', element: <CandidateProfilePage /> },
-      { path: '/candidate/applications', element: <ApplicationsPage /> },
+      {
+        element: <DashboardLayout />,
+        children: [
+          { path: '/candidate/dashboard', element: <CandidateDashboardPage /> },
+          { path: '/candidate/profile', element: <CandidateProfilePage /> },
+          { path: '/candidate/applications', element: <ApplicationsPage /> },
+        ],
+      },
     ],
   },
 
@@ -73,23 +85,36 @@ const router = createBrowserRouter([
   {
     element: <ProtectedRoute allowedRoles={['recruiter']} />,
     children: [
-      { path: '/recruiter/dashboard', element: <RecruiterDashboardPage /> },
-      { path: '/recruiter/company', element: <CompanyManagementPage /> },
-      { path: '/recruiter/jobs/manage', element: <ManageJobsPage /> },
-      { path: '/recruiter/jobs/create', element: <CreateJobPage /> },
-      { path: '/recruiter/jobs/:id/applicants', element: <ViewApplicantsPage /> },
+      {
+        element: <DashboardLayout />,
+        children: [
+          { path: '/recruiter/dashboard', element: <RecruiterDashboardPage /> },
+          { path: '/recruiter/company', element: <CompanyManagementPage /> },
+          { path: '/recruiter/jobs/manage', element: <ManageJobsPage /> },
+          { path: '/recruiter/jobs/create', element: <CreateJobPage /> },
+          { path: '/recruiter/jobs/:id/applicants', element: <ViewApplicantsPage /> },
+        ],
+      },
     ],
   },
 
-  // ── Admin routes ───────────────────────────────────────────────────────
+  // ── Admin routes ──────────────────────────────────────────────────────
   {
     element: <ProtectedRoute allowedRoles={['admin']} />,
     children: [
-      { path: '/admin/dashboard', element: <AdminDashboardPage /> },
-      { path: '/admin/users', element: <AdminUserManagementPage /> },
-      { path: '/admin/jobs', element: <AdminJobManagementPage /> },
+      {
+        element: <DashboardLayout />,
+        children: [
+          { path: '/admin/dashboard', element: <AdminDashboardPage /> },
+          { path: '/admin/users', element: <AdminUserManagementPage /> },
+          { path: '/admin/jobs', element: <AdminJobManagementPage /> },
+        ],
+      },
     ],
   },
+
+  // ── Catch-all ──────────────────────────────────────────────────────────
+  { path: '*', element: <NotFoundPage /> },
 ]);
 
 export default router;
