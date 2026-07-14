@@ -111,8 +111,16 @@ export default function JobFormModal({ job, onClose }) {
       onClose()
     } catch (error) {
       console.error('Error submitting form:', error);
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to save job';
-      setError(errorMessage)
+      // Check if it's a validation error with field details
+      const errors = error.response?.data?.errors;
+      if (errors && errors.length > 0) {
+        const fieldError = errors[0];
+        const errorMessage = `${fieldError.field}: ${fieldError.message}`;
+        setError(errorMessage);
+      } else {
+        const errorMessage = error.response?.data?.message || error.message || 'Failed to save job';
+        setError(errorMessage);
+      }
     }
   }
 

@@ -24,7 +24,7 @@ export default function RecruiterDashboard() {
   const loadData = async () => {
     try {
       const userId = user?.id
-      await fetchJobs(1, userId)
+      await fetchJobs(1, userId, true) // true = manageMode
       await fetchCompanies()
     } catch (error) {
       console.error('Failed to load data')

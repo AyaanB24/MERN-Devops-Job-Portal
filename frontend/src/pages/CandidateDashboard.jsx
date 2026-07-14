@@ -30,9 +30,10 @@ export default function CandidateDashboard() {
 
   const loadApplications = async () => {
     try {
-      await fetchApplications()
+      await fetchApplications();
     } catch (error) {
-      console.error('Failed to load applications')
+      // Silently fail - error is handled in store
+      console.log('Applications loaded with default empty state');
     }
   }
 

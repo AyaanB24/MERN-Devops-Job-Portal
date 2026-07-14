@@ -17,7 +17,7 @@ export default function ManageJobsPage() {
 
   const loadJobs = async () => {
     try {
-      await fetchJobs(1, user?.id)
+      await fetchJobs(1, user?.id, true) // true = manageMode
     } catch (error) {
       console.error('Failed to load jobs')
     }
@@ -29,7 +29,9 @@ export default function ManageJobsPage() {
         await deleteJob(jobId)
         alert('Job deleted successfully')
       } catch (error) {
-        alert('Failed to delete job')
+        const errorMessage = error.response?.data?.message || error.message || 'Failed to delete job'
+        console.error('Delete job error:', errorMessage);
+        alert(`Failed to delete job: ${errorMessage}`)
       }
     }
   }
