@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply transition-colors duration-300;
+}
+
+/* Light mode */
+body {
+  @apply bg-white text-gray-900;
+}
+
+/* Dark mode */
+html.dark body {
+  @apply bg-gray-950 text-gray-50;
+}

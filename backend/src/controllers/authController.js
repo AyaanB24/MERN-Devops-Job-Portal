@@ -22,14 +22,25 @@ const register = async (req, res, next) => {
     // 2. Delegate to the service layer for business logic validation & execution
     const user = await authService.registerUser(req.body);
 
-    // 3. Send response back to the client
+    // 3. Generate JWT token for newly registered user
+    const jwt = require('jsonwebtoken');
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET || 'mySuperSecretKey',
+      { expiresIn: '1d' }
+    );
+
+    // 4. Send response back to the client with token and user
     return res.status(201).json({
       success: true,
       message: 'User registered successfully',
-      data: user,
+      data: {
+        user,
+        token,
+      },
     });
   } catch (error) {
-    // 4. Pass control to the global Express error handling middleware
+    // 5. Pass control to the global Express error handling middleware
     next(error);
   }
 };

@@ -3,6 +3,7 @@ const authController = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
 const uploadResume = require('../middleware/uploadMiddleware');
+const { validateRegister, validateLogin } = require('../validators/authValidator');
 
 const router = express.Router();
 
@@ -12,10 +13,10 @@ const router = express.Router();
  */
 
 // POST /register - Handles new user signup
-router.post('/register', authController.register);
+router.post('/register', validateRegister, authController.register);
 
 // POST /login - Handles existing user signin
-router.post('/login', authController.login);
+router.post('/login', validateLogin, authController.login);
 
 // GET /profile - Retrieves authenticated user profile
 router.get('/profile', protect, authController.getProfile);
