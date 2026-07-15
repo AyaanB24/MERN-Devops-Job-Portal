@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { MapPin, Briefcase, DollarSign, Calendar, ArrowLeft, Loader, Send } from 'lucide-react'
+import { MapPin, Briefcase, DollarSign, Calendar, ArrowLeft, Loader, Send, CheckCircle, Clock, XCircle } from 'lucide-react'
 import { useJobStore } from '../store/jobStore'
 import { useAuthStore } from '../store/authStore'
+import axios from 'axios'
+
+const statusConfig = {
+  pending: { icon: Clock, color: 'text-yellow-600', bgColor: 'bg-yellow-100 dark:bg-yellow-900/30', label: 'Pending' },
+  accepted: { icon: CheckCircle, color: 'text-green-600', bgColor: 'bg-green-100 dark:bg-green-900/30', label: 'Accepted' },
+  rejected: { icon: XCircle, color: 'text-red-600', bgColor: 'bg-red-100 dark:bg-red-900/30', label: 'Rejected' },
+}
 
 export default function JobDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [job, setJob] = useState(null)
+  const [application, setApplication] = useState(null)
   const [loading, setLoading] = useState(true)
   const [showApplyForm, setShowApplyForm] = useState(false)
   const [coverLetter, setCoverLetter] = useState('')
@@ -23,10 +31,37 @@ export default function JobDetailPage() {
     try {
       const jobData = await fetchJobById(id)
       setJob(jobData)
+      
+      // If candidate is logged in, check if they already applied
+      if (isAuthenticated() && isCandidate() && user?.id) {
+        await fetchCandidateApplication()
+      }
     } catch (error) {
       console.error('Failed to fetch job')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchCandidateApplication = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/applications?job=${id}`)
+      const applications = response.data.data || []
+      
+      // Find application by current candidate - handle both object and string IDs
+      const candidateId = user?.id
+      const candidateApp = applications.find(app => {
+        const appCandidateId = typeof app.candidate === 'object' ? app.candidate?._id : app.candidate
+        return appCandidateId === candidateId
+      })
+      
+      if (candidateApp) {
+        console.log('Found candidate application:', candidateApp)
+        setApplication(candidateApp)
+      }
+    } catch (error) {
+      // Application not found or error fetching - that's ok
+      console.log('No application found for this job:', error.message)
     }
   }
 
@@ -43,9 +78,11 @@ export default function JobDetailPage() {
       alert('Application submitted successfully!')
       setCoverLetter('')
       setShowApplyForm(false)
-      navigate('/candidate/dashboard')
+      // Refetch application details
+      await fetchCandidateApplication()
     } catch (error) {
-      alert('Failed to submit application')
+      const errorMsg = error.response?.data?.message || 'Failed to submit application'
+      alert(errorMsg)
     } finally {
       setApplying(false)
     }
@@ -90,6 +127,28 @@ export default function JobDetailPage() {
           Back to Jobs
         </button>
 
+        {/* Application Status Banner (if candidate has applied) */}
+        {application && (
+          <div className={`rounded-lg shadow-md p-6 mb-8 border-2 ${statusConfig[application.status].bgColor}`}>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                {React.createElement(statusConfig[application.status].icon, {
+                  size: 28,
+                  className: statusConfig[application.status].color
+                })}
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                    Application Status: {statusConfig[application.status].label}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Applied on {new Date(application.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Job Header */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-8 border border-gray-200 dark:border-gray-700">
           <div className="flex justify-between items-start mb-4">
@@ -101,7 +160,7 @@ export default function JobDetailPage() {
                 {job.company?.companyName || 'Company Name'}
               </p>
             </div>
-            {isAuthenticated() && isCandidate() && (
+            {isAuthenticated() && isCandidate() && !application && (
               <button
                 onClick={() => setShowApplyForm(!showApplyForm)}
                 className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors flex items-center gap-2"
@@ -177,8 +236,60 @@ export default function JobDetailPage() {
           </div>
         )}
 
+        {/* Application Details (if applied) - MOVED UP after status banner */}
+        {application && (
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg shadow-lg p-8 mb-8 border-2 border-blue-200 dark:border-blue-800">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+              <FileText size={28} className="text-blue-600" />
+              Your Application Details
+            </h2>
+            
+            <div className="space-y-6">
+              {/* Cover Letter */}
+              <div>
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wide">
+                  📝 Cover Letter
+                </label>
+                <div className="p-5 bg-white dark:bg-gray-800 rounded-lg border-2 border-blue-200 dark:border-blue-700">
+                  <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+                    {application.coverLetter || 'No cover letter provided'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Application Metadata */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t-2 border-blue-200 dark:border-blue-700">
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-1 font-semibold uppercase">Applied on</p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">
+                    {new Date(application.createdAt).toLocaleDateString()}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {new Date(application.createdAt).toLocaleTimeString()}
+                  </p>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-1 font-semibold uppercase">Current Status</p>
+                  <div className={`inline-block px-4 py-2 rounded-full text-sm font-bold ${statusConfig[application.status].bgColor} ${statusConfig[application.status].color} flex items-center gap-2`}>
+                    {React.createElement(statusConfig[application.status].icon, { size: 20 })}
+                    {statusConfig[application.status].label}
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-1 font-semibold uppercase">Application ID</p>
+                  <p className="text-sm font-mono text-gray-900 dark:text-white break-all">
+                    {application._id?.slice(0, 12)}...
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Apply Form */}
-        {showApplyForm && isAuthenticated() && isCandidate() && (
+        {showApplyForm && isAuthenticated() && isCandidate() && !application && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-200 dark:border-gray-700">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Submit Your Application</h2>
             

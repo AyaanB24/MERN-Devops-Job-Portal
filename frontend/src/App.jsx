@@ -10,6 +10,7 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import JobsPage from './pages/JobsPage'
 import JobDetailPage from './pages/JobDetailPage'
+import ApplicationDetailPage from './pages/ApplicationDetailPage'
 import ProfilePage from './pages/ProfilePage'
 import NotFoundPage from './pages/NotFoundPage'
 import CandidateDashboard from './pages/CandidateDashboard'
@@ -76,6 +77,14 @@ function App() {
                 element={
                   <ProtectedRoute requiredRole="candidate">
                     <CandidateDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/application/:applicationId" 
+                element={
+                  <ProtectedRoute requiredRole="candidate">
+                    <ApplicationDetailPage />
                   </ProtectedRoute>
                 } 
               />

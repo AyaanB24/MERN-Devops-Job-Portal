@@ -46,8 +46,8 @@ exports.getApplications = asyncHandler(async (req, res) => {
   }
 
   const applications = await Application.find(query)
-    .populate('candidate', 'name email')
-    .populate('job', 'title');
+    .populate('candidate', 'name email _id')
+    .populate('job', 'title salary location _id');
     
   res.status(200).json({ success: true, data: applications });
 });
