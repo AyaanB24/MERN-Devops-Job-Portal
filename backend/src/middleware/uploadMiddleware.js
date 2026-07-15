@@ -30,15 +30,24 @@ const storage = multer.diskStorage({
   },
 });
 
-// 3. File Filter to enforce PDF uploads only
+// 3. File Filter to enforce resume file types (PDF, DOC, DOCX)
 const fileFilter = (req, file, cb) => {
   // Verify both mime type and file extension
   const fileExt = path.extname(file.originalname).toLowerCase();
   
-  if (file.mimetype === 'application/pdf' && fileExt === '.pdf') {
+  // Allowed MIME types and extensions
+  const allowedMimeTypes = [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  ];
+  
+  const allowedExtensions = ['.pdf', '.doc', '.docx'];
+  
+  if (allowedMimeTypes.includes(file.mimetype) && allowedExtensions.includes(fileExt)) {
     cb(null, true);
   } else {
-    cb(new Error('Invalid file type. Only PDF resumes are allowed!'), false);
+    cb(new Error('Invalid file type. Only PDF, DOC, and DOCX resumes are allowed!'), false);
   }
 };
 

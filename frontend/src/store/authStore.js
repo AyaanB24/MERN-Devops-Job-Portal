@@ -178,7 +178,13 @@ export const useAuthStore = create((set, get) => ({
         }
       })
 
-      set({ isLoading: false })
+      // Update user with new resume path from response
+      if (response.data.data?.user) {
+        set({ user: response.data.data.user, isLoading: false })
+      } else {
+        set({ isLoading: false })
+      }
+      
       return response.data
     } catch (error) {
       const errorMsg = error.response?.data?.message || 'Failed to upload resume'

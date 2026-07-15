@@ -124,10 +124,86 @@ const updateProfile = async (req, res, next) => {
   }
 };
 
+/**
+ * Handles HTTP requests to get a candidate's profile by ID.
+ * Used by recruiters to view candidate details.
+ * 
+ * @param {Object} req - Express request object with candidateId in params
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ */
+const getCandidateProfile = async (req, res, next) => {
+  try {
+    const { candidateId } = req.params;
+    const User = require('../models/User');
+
+    // Fetch candidate profile without password
+    const candidate = await User.findById(candidateId).select('-password');
+
+    if (!candidate) {
+      return res.status(404).json({
+        success: false,
+        message: 'Candidate not found',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Candidate profile retrieved successfully',
+      data: candidate,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Handles resume file upload and saves the path to the user's profile.
+ * 
+ * @param {Object} req - Express request object with file attached by Multer
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ */
+const uploadResumeFile = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No file uploaded. Please upload a resume.',
+      });
+    }
+
+    // Save resume path to user profile
+    const User = require('../models/User');
+    const resumePath = `/uploads/resumes/${req.file.filename}`;
+    
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: { resume: resumePath } },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    return res.status(200).json({
+      success: true,
+      message: 'Resume uploaded successfully',
+      data: {
+        filename: req.file.filename,
+        path: resumePath,
+        size: req.file.size,
+        user: updatedUser
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
   getProfile,
   updateProfile,
+  getCandidateProfile,
+  uploadResumeFile,
 };
 

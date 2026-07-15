@@ -52,9 +52,13 @@ export default function ProfilePage() {
         bio: formData.bio,
         skills: formData.skills.split(',').map(s => s.trim()).filter(s => s)
       })
+      
+      // Refresh profile to ensure data is persisted
+      await getProfile()
       alert('Profile updated successfully!')
     } catch (error) {
       console.error('Failed to update profile')
+      alert('Failed to update profile')
     }
   }
 
@@ -67,10 +71,14 @@ export default function ProfilePage() {
 
     try {
       await uploadResume(resumeFile)
+      
+      // Refresh profile to get updated resume path
+      await getProfile()
       alert('Resume uploaded successfully!')
       setResumeFile(null)
     } catch (error) {
       console.error('Failed to upload resume')
+      alert('Failed to upload resume')
     }
   }
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Loader, CheckCircle, XCircle, Clock } from 'lucide-react'
+import { useParams, useNavigate, Link } from 'react-router-dom'
+import { ArrowLeft, Loader, CheckCircle, XCircle, Clock, User } from 'lucide-react'
 import { useJobStore } from '../store/jobStore'
 
 export default function ViewApplicationsPage() {
@@ -123,6 +123,16 @@ export default function ViewApplicationsPage() {
                     </button>
                   </div>
                 )}
+
+                <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <Link
+                    to={`/candidate/${app.candidate?._id || app.candidate}/profile`}
+                    className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+                  >
+                    <User size={18} />
+                    View Profile
+                  </Link>
+                </div>
               </div>
             ))}
           </div>

@@ -21,6 +21,9 @@ router.post('/login', validateLogin, authController.login);
 // GET /profile - Retrieves authenticated user profile
 router.get('/profile', protect, authController.getProfile);
 
+// GET /candidate/:candidateId - Retrieves a specific candidate's profile (for recruiters)
+router.get('/candidate/:candidateId', protect, authController.getCandidateProfile);
+
 // PUT /profile - Updates authenticated user profile
 router.put('/profile', protect, authController.updateProfile);
 
@@ -41,7 +44,7 @@ router.get('/recruiter-only', protect, authorize('recruiter'), (req, res) => {
 });
 
 // POST /profile/resume - Handles resume PDF upload
-router.post('/profile/resume', protect, (req, res) => {
+router.post('/profile/resume', protect, (req, res, next) => {
   // Wrap in a custom callback to intercept and format Multer validation errors
   uploadResume.single('resume')(req, res, (err) => {
     if (err) {
@@ -50,21 +53,8 @@ router.post('/profile/resume', protect, (req, res) => {
         message: err.message,
       });
     }
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: 'No file uploaded. Please upload a PDF resume.',
-      });
-    }
-    return res.status(200).json({
-      success: true,
-      message: 'Resume uploaded successfully',
-      file: {
-        filename: req.file.filename,
-        path: req.file.path,
-        size: req.file.size,
-      },
-    });
+    // Call the controller to save resume to database
+    authController.uploadResumeFile(req, res, next);
   });
 });
 

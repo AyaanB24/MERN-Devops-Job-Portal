@@ -13,9 +13,11 @@ const User = require('../models/User');
 const updateProfile = async (userId, updatePayload) => {
   // 1. Strict whitelist of fields that candidates are allowed to update
   const allowedFields = [
+    'name',
     'bio',
     'skills',
     'profilePhoto',
+    'resume',
     'education',
     'keySkills',
     'languages',
@@ -24,7 +26,6 @@ const updateProfile = async (userId, updatePayload) => {
     'profileSummary',
     'accomplishments',
     'academicAchievements',
-    'resume',
   ];
 
   // 2. Filter input payload to discard any unauthorized fields (e.g., password, email, role)
@@ -36,12 +37,12 @@ const updateProfile = async (userId, updatePayload) => {
   }
 
   // 3. Update the database document
-  // { returnDocument: 'after' } returns the modified document rather than the original (replaces deprecated 'new: true')
+  // { new: true } returns the modified document rather than the original
   // { runValidators: true } runs schema-defined validations on the updated fields
   const updatedUser = await User.findByIdAndUpdate(
     userId,
     { $set: updates },
-    { returnDocument: 'after', runValidators: true }
+    { new: true, runValidators: true }
   ).select('-password');
 
   if (!updatedUser) {

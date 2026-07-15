@@ -11,6 +11,7 @@ import RegisterPage from './pages/RegisterPage'
 import JobsPage from './pages/JobsPage'
 import JobDetailPage from './pages/JobDetailPage'
 import ApplicationDetailPage from './pages/ApplicationDetailPage'
+import CandidateProfilePage from './pages/CandidateProfilePage'
 import ProfilePage from './pages/ProfilePage'
 import NotFoundPage from './pages/NotFoundPage'
 import CandidateDashboard from './pages/CandidateDashboard'
@@ -103,6 +104,14 @@ function App() {
                 element={
                   <ProtectedRoute requiredRole="recruiter">
                     <RecruiterDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/candidate/:candidateId/profile" 
+                element={
+                  <ProtectedRoute requiredRole="recruiter">
+                    <CandidateProfilePage />
                   </ProtectedRoute>
                 } 
               />
