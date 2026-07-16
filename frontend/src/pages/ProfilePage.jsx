@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { User, Mail, FileText, Loader, Upload } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
+import ResumeViewer from '../components/ResumeViewer'
 
 export default function ProfilePage() {
   const { user, isAuthenticated, getProfile, updateProfile, uploadResume, isLoading } = useAuthStore()
@@ -203,47 +204,58 @@ export default function ProfilePage() {
 
         {/* Resume Upload (Candidate Only) */}
         {user.role === 'candidate' && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-              Resume
-            </h2>
-            <form onSubmit={handleResumeUpload} className="space-y-4">
-              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-blue-500 transition-colors">
-                <label className="cursor-pointer">
-                  <div className="flex flex-col items-center gap-2">
-                    <FileText size={40} className="text-gray-400" />
-                    <p className="text-gray-600 dark:text-gray-400 font-medium">
-                      Click to upload your resume
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-500">
-                      PDF, DOC, DOCX • Max 5MB
-                    </p>
-                  </div>
-                  <input
-                    type="file"
-                    onChange={handleResumeChange}
-                    accept=".pdf,.doc,.docx"
-                    className="hidden"
-                  />
-                </label>
+          <div className="space-y-8">
+            {/* Resume Preview */}
+            {user.resume && (
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Your Resume</h2>
+                <ResumeViewer resumePath={user.resume} candidateName={user.name} />
               </div>
-              
-              {resumeFile && (
-                <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                  <span className="text-sm text-green-700 dark:text-green-300 font-medium">
-                    {resumeFile.name}
-                  </span>
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded transition-colors disabled:opacity-50"
-                  >
-                    <Upload size={16} />
-                    {isLoading ? 'Uploading...' : 'Upload'}
-                  </button>
+            )}
+
+            {/* Resume Upload Form */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+                {user.resume ? 'Update Resume' : 'Upload Resume'}
+              </h2>
+              <form onSubmit={handleResumeUpload} className="space-y-4">
+                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-blue-500 transition-colors">
+                  <label className="cursor-pointer">
+                    <div className="flex flex-col items-center gap-2">
+                      <FileText size={40} className="text-gray-400" />
+                      <p className="text-gray-600 dark:text-gray-400 font-medium">
+                        Click to upload your resume
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-500">
+                        PDF, DOC, DOCX • Max 5MB
+                      </p>
+                    </div>
+                    <input
+                      type="file"
+                      onChange={handleResumeChange}
+                      accept=".pdf,.doc,.docx"
+                      className="hidden"
+                    />
+                  </label>
                 </div>
-              )}
-            </form>
+                
+                {resumeFile && (
+                  <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                    <span className="text-sm text-green-700 dark:text-green-300 font-medium">
+                      {resumeFile.name}
+                    </span>
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded transition-colors disabled:opacity-50"
+                    >
+                      <Upload size={16} />
+                      {isLoading ? 'Uploading...' : 'Upload'}
+                    </button>
+                  </div>
+                )}
+              </form>
+            </div>
           </div>
         )}
       </div>

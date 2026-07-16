@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Loader, Mail, Download, FileText, User, Award } from 'lucide-react'
 import axios from 'axios'
+import ResumeViewer from '../components/ResumeViewer'
 
 export default function CandidateProfilePage() {
   const { candidateId } = useParams()
@@ -157,20 +158,7 @@ export default function CandidateProfilePage() {
               Resume
             </h2>
             {candidate.resume ? (
-              <div className="space-y-4">
-                <p className="text-gray-600 dark:text-gray-400 text-sm">
-                  Resume file available for download
-                </p>
-                <a
-                  href={candidate.resume}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors"
-                >
-                  <Download size={20} />
-                  Download Resume
-                </a>
-              </div>
+              <ResumeViewer resumePath={candidate.resume} candidateName={candidate.name} />
             ) : (
               <p className="text-gray-600 dark:text-gray-400">
                 No resume uploaded
@@ -213,17 +201,6 @@ export default function CandidateProfilePage() {
           >
             Back to Applications
           </button>
-          {candidate.resume && (
-            <a
-              href={candidate.resume}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 px-6 py-3 border-2 border-green-600 text-green-600 dark:text-green-400 font-semibold rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors text-center flex items-center justify-center gap-2"
-            >
-              <Download size={20} />
-              Download Resume
-            </a>
-          )}
         </div>
       </div>
     </div>
