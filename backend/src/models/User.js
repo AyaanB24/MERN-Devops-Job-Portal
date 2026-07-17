@@ -53,6 +53,15 @@ const userSchema = new mongoose.Schema(
       maxlength: [250, 'Bio cannot exceed 250 characters'],
       trim: true,
     },
+    isGoogleAuth: {
+      type: Boolean,
+      default: false,
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true, // Allow null values for non-OAuth users
+    },
   },
   {
     timestamps: true, // Automatically manages createdAt and updatedAt fields

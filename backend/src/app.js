@@ -29,12 +29,14 @@ const jobRoutes = require("./routes/jobRoutes");
 const companyRoutes = require("./routes/companyRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const applicationRoutes = require("./routes/applicationRoutes");
+const oauthRoutes = require("./routes/oauthRoutes");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/companies", companyRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/applications", applicationRoutes);
+app.use("/api/oauth", oauthRoutes);
 
 // ── Error Handling (must be LAST) ─────────────────────────────────────────────
 app.use(notFound);      // 404 — catches any unmatched route

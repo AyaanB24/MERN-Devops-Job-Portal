@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Mail, Lock, Loader } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
+import GoogleLoginButton from '../components/GoogleLoginButton'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -117,6 +118,38 @@ export default function LoginPage() {
               )}
             </button>
           </form>
+
+          {/* Divider */}
+          <div className="my-6 flex items-center gap-4">
+            <div className="flex-1 h-px bg-gray-300 dark:bg-gray-600"></div>
+            <span className="text-sm text-gray-600 dark:text-gray-400">OR</span>
+            <div className="flex-1 h-px bg-gray-300 dark:bg-gray-600"></div>
+          </div>
+
+          {/* Google Sign-In */}
+          <GoogleLoginButton
+            role="candidate"
+            onSuccess={(data) => {
+              // Store token and user
+              localStorage.setItem('token', data.token)
+              useAuthStore.setState({ 
+                token: data.token, 
+                user: data.user,
+                isLoading: false 
+              })
+              
+              // Redirect based on role
+              if (data.user?.role === 'recruiter') {
+                navigate('/recruiter/dashboard')
+              } else {
+                navigate('/candidate/dashboard')
+              }
+            }}
+            onError={(error) => {
+              alert('Google Sign-In failed: ' + error)
+            }}
+            isLoading={isLoading}
+          />
 
           {/* Footer */}
           <div className="mt-6 text-center">
