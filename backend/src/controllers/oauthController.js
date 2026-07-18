@@ -42,13 +42,6 @@ const verifyGoogleToken = async (req, res, next) => {
       });
     }
 
-    if (!role || (role !== 'candidate' && role !== 'recruiter')) {
-      return res.status(400).json({
-        success: false,
-        message: 'Valid role (candidate or recruiter) is required'
-      });
-    }
-
     const oauth2Client = getOAuth2Client();
     if (!oauth2Client) {
       return res.status(503).json({
@@ -77,6 +70,7 @@ const verifyGoogleToken = async (req, res, next) => {
 
     // Check if user exists
     let user = await User.findOne({ email });
+    let isNew = false;
 
     if (user) {
       // User exists - just verify they're logging in
@@ -84,12 +78,13 @@ const verifyGoogleToken = async (req, res, next) => {
     } else {
       // Create new user from Google info
       console.log(`Creating new user ${email} from Google`);
+      isNew = true;
       
       user = await User.create({
         name: name || email.split('@')[0],
         email: email,
         password: sub, // Store Google ID as password (won't be used for login)
-        role: role,
+        role: role || 'candidate', // Use provided role or default to candidate
         profilePhoto: picture || '',
         isGoogleAuth: true // Flag for OAuth user
       });
@@ -102,10 +97,11 @@ const verifyGoogleToken = async (req, res, next) => {
       { expiresIn: '1d' }
     );
 
-    // Return user and token
+    // Return user and token with isNew flag
     return res.status(200).json({
       success: true,
       message: 'Login successful',
+      isNew: isNew,  // ← NEW: Flag to indicate if user was just created
       data: {
         user: {
           _id: user._id,

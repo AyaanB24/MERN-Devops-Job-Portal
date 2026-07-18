@@ -71,14 +71,21 @@ export default function ProfilePage() {
     }
 
     try {
-      await uploadResume(resumeFile)
+      const uploadResponse = await uploadResume(resumeFile)
       
-      // Refresh profile to get updated resume path
+      // Refresh profile immediately to ensure we have latest data
       await getProfile()
+      
       alert('Resume uploaded successfully!')
       setResumeFile(null)
+      
+      // Optionally reset file input
+      const fileInput = document.querySelector('input[type="file"]')
+      if (fileInput) {
+        fileInput.value = ''
+      }
     } catch (error) {
-      console.error('Failed to upload resume')
+      console.error('Failed to upload resume:', error)
       alert('Failed to upload resume')
     }
   }
@@ -207,9 +214,11 @@ export default function ProfilePage() {
           <div className="space-y-8">
             {/* Resume Preview */}
             {user.resume && (
-              <div>
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Your Resume</h2>
-                <ResumeViewer resumePath={user.resume} candidateName={user.name} />
+                <div className="h-96 md:h-screen">
+                  <ResumeViewer resumePath={user.resume} candidateName={user.name} />
+                </div>
               </div>
             )}
 

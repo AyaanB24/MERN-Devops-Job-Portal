@@ -8,6 +8,7 @@ import Footer from './components/Footer'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
+import OAuthRoleSelectionPage from './pages/OAuthRoleSelectionPage'
 import JobsPage from './pages/JobsPage'
 import JobDetailPage from './pages/JobDetailPage'
 import ApplicationDetailPage from './pages/ApplicationDetailPage'
@@ -69,6 +70,7 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
+              <Route path="/oauth-select-role" element={<OAuthRoleSelectionPage />} />
               <Route path="/jobs" element={<JobsPage />} />
               <Route path="/job/:id" element={<JobDetailPage />} />
               

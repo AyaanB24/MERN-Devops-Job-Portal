@@ -128,26 +128,7 @@ export default function LoginPage() {
 
           {/* Google Sign-In */}
           <GoogleLoginButton
-            role="candidate"
-            onSuccess={(data) => {
-              // Store token and user
-              localStorage.setItem('token', data.token)
-              useAuthStore.setState({ 
-                token: data.token, 
-                user: data.user,
-                isLoading: false 
-              })
-              
-              // Redirect based on role
-              if (data.user?.role === 'recruiter') {
-                navigate('/recruiter/dashboard')
-              } else {
-                navigate('/candidate/dashboard')
-              }
-            }}
-            onError={(error) => {
-              alert('Google Sign-In failed: ' + error)
-            }}
+            role={null}
             isLoading={isLoading}
           />
 

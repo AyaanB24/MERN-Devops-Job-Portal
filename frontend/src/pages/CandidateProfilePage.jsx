@@ -129,46 +129,28 @@ export default function CandidateProfilePage() {
           </div>
         </div>
 
-        {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Skills Section */}
-          {candidate.skills && candidate.skills.length > 0 && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-200 dark:border-gray-700">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-                <Award size={28} className="text-blue-600" />
-                Skills
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {candidate.skills.map((skill, index) => (
-                  <span
-                    key={index}
-                    className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-semibold"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Resume Section */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-200 dark:border-gray-700">
+        {/* Skills Section - Full Width Horizontal */}
+        {candidate.skills && candidate.skills.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-200 dark:border-gray-700 mb-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-              <FileText size={28} className="text-green-600" />
-              Resume
+              <Award size={28} className="text-blue-600" />
+              Skills
             </h2>
-            {candidate.resume ? (
-              <ResumeViewer resumePath={candidate.resume} candidateName={candidate.name} />
-            ) : (
-              <p className="text-gray-600 dark:text-gray-400">
-                No resume uploaded
-              </p>
-            )}
+            <div className="flex flex-wrap gap-3">
+              {candidate.skills.map((skill, index) => (
+                <span
+                  key={index}
+                  className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-semibold"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Profile Details */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-200 dark:border-gray-700 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Profile Details</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -191,6 +173,26 @@ export default function CandidateProfilePage() {
               </div>
             )}
           </div>
+        </div>
+
+        {/* Resume Section - Full Width Vertical */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-200 dark:border-gray-700 mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+            <FileText size={28} className="text-green-600" />
+            Resume
+          </h2>
+          {candidate.resume ? (
+            <div className="min-h-screen">
+              <ResumeViewer resumePath={candidate.resume} candidateName={candidate.name} />
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <FileText size={48} className="text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600 dark:text-gray-400 text-lg">
+                No resume uploaded
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Action Buttons */}

@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Loader } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { useAuthStore } from '../store/authStore'
+import axios from 'axios'
 
 /**
  * GoogleLoginButton Component
@@ -8,36 +11,36 @@ import { Loader } from 'lucide-react'
 export default function GoogleLoginButton({ 
   onSuccess, 
   onError, 
-  role = 'candidate',
+  role = null,
   isLoading = false
 }) {
   const [googleLoaded, setGoogleLoaded] = useState(false)
   const [processing, setProcessing] = useState(false)
   const [hasClientId, setHasClientId] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
-    setHasClientId(clientId && clientId !== 'YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com')
+    const isConfigured = clientId && clientId !== 'YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com'
+    setHasClientId(isConfigured)
   }, [])
 
   useEffect(() => {
-    // Load Google Sign-In script
-    if (document.getElementById('google-sign-in-script')) {
+    // Load Google Sign-In script only once globally
+    if (window.google?.accounts?.id) {
       setGoogleLoaded(true)
+      renderGoogleButton()
       return
     }
 
     const script = document.createElement('script')
-    script.id = 'google-sign-in-script'
     script.src = 'https://accounts.google.com/gsi/client'
     script.async = true
     script.defer = true
     
     script.onload = () => {
       setGoogleLoaded(true)
-      if (hasClientId) {
-        initializeGoogle()
-      }
+      renderGoogleButton()
     }
 
     script.onerror = () => {
@@ -46,51 +49,45 @@ export default function GoogleLoginButton({
     }
 
     document.body.appendChild(script)
+  }, [hasClientId])
 
-    return () => {
-      if (document.getElementById('google-sign-in-script')) {
-        document.getElementById('google-sign-in-script').remove()
+  const renderGoogleButton = () => {
+    if (!hasClientId) return
+
+    // Wait for Google library to be fully available
+    const checkGoogle = setInterval(() => {
+      if (window.google?.accounts?.id && document.getElementById('google-button-container')) {
+        clearInterval(checkGoogle)
+
+        try {
+          const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+          
+          // Initialize only once
+          if (!window.__googleInitialized) {
+            window.google.accounts.id.initialize({
+              client_id: clientId,
+              callback: handleCredentialResponse
+            })
+            window.__googleInitialized = true
+          }
+
+          // Render button
+          const container = document.getElementById('google-button-container')
+          if (container && container.children.length === 0) {
+            window.google.accounts.id.renderButton(container, {
+              theme: 'outline',
+              size: 'large',
+              text: 'signin_with'
+            })
+          }
+        } catch (error) {
+          console.error('Error rendering Google button:', error)
+        }
       }
-    }
-  }, [])
+    }, 100)
 
-  useEffect(() => {
-    if (googleLoaded && hasClientId) {
-      initializeGoogle()
-    }
-  }, [googleLoaded, hasClientId, role])
-
-  const initializeGoogle = () => {
-    if (typeof window === 'undefined' || !window.google) {
-      return
-    }
-
-    try {
-      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
-      
-      if (!clientId || clientId === 'YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com') {
-        console.warn('VITE_GOOGLE_CLIENT_ID not configured')
-        return
-      }
-
-      window.google.accounts.id.initialize({
-        client_id: clientId,
-        callback: handleCredentialResponse
-      })
-
-      // Render button
-      const container = document.getElementById('google-button-container')
-      if (container && container.children.length === 0) {
-        window.google.accounts.id.renderButton(container, {
-          theme: 'outline',
-          size: 'large',
-          width: '100%',
-          text: 'signin_with'
-        })
-      }
-    } catch (error) {
-      console.error('Error initializing Google Sign-In:', error)
-    }
+    // Clear interval after 5 seconds
+    setTimeout(() => clearInterval(checkGoogle), 5000)
   }
 
   const handleCredentialResponse = async (response) => {
@@ -103,36 +100,65 @@ export default function GoogleLoginButton({
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ idToken, role })
+          body: JSON.stringify({ 
+            idToken, 
+            role: role || null,
+            isSignup: !!role
+          })
         }
       )
 
       const data = await backendResponse.json()
 
       if (data.success) {
-        onSuccess(data.data)
+        const userData = data.data
+        
+        // IMPORTANT: Update store and axios IMMEDIATELY
+        localStorage.setItem('token', userData.token)
+        axios.defaults.headers.common['Authorization'] = `Bearer ${userData.token}`
+        useAuthStore.setState({
+          token: userData.token,
+          user: userData.user,
+          isLoading: false,
+          error: null
+        })
+        
+        if (data.isNew) {
+          // NEW USER - show role selection
+          sessionStorage.setItem('oauthData', JSON.stringify(userData))
+          navigate('/oauth-select-role')
+        } else {
+          // EXISTING USER - auto-redirect immediately
+          if (onSuccess) {
+            onSuccess(userData)
+          } else {
+            // Auto-redirect for login page
+            const userRole = userData.user.role
+            if (userRole === 'recruiter') {
+              navigate('/recruiter/dashboard')
+            } else {
+              navigate('/candidate/dashboard')
+            }
+          }
+        }
       } else {
-        onError(data.message || 'Authentication failed')
+        const errorMsg = data.message || 'Authentication failed'
+        if (onError) onError(errorMsg)
+        else alert(errorMsg)
       }
     } catch (error) {
-      onError(error.message || 'Authentication failed')
+      const errorMsg = error.message || 'Authentication failed'
+      if (onError) onError(errorMsg)
+      else alert(errorMsg)
     } finally {
       setProcessing(false)
     }
   }
 
-  const handlePlaceholderClick = () => {
-    alert('Google Sign-In will be configured in .env file. See OAUTH_SETUP.md for details.')
-  }
-
   if (!googleLoaded) {
     return (
       <div className="w-full">
-        <button
-          type="button"
-          disabled
-          className="w-full py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center gap-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-        >
+        <button disabled className="w-full py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center gap-2 text-gray-700 dark:text-gray-300">
           <Loader size={18} className="animate-spin" />
           <span className="font-medium">Loading...</span>
         </button>
@@ -143,10 +169,9 @@ export default function GoogleLoginButton({
   if (!hasClientId) {
     return (
       <div className="w-full">
-        <button
-          type="button"
-          onClick={handlePlaceholderClick}
-          className="w-full py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center gap-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        <button 
+          onClick={() => alert('Configure VITE_GOOGLE_CLIENT_ID in frontend/.env.local')}
+          className="w-full py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center gap-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>

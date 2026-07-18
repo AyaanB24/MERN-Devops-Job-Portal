@@ -58,6 +58,9 @@ router.post('/profile/resume', protect, (req, res, next) => {
   });
 });
 
+// PUT /update-oauth-role - Updates user role after OAuth login
+router.put('/update-oauth-role', protect, authController.updateOAuthRole);
+
 module.exports = router;
 
 

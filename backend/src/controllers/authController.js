@@ -198,6 +198,53 @@ const uploadResumeFile = async (req, res, next) => {
   }
 };
 
+/**
+ * Updates the user's role after OAuth authentication.
+ * Used when user logs in via OAuth and needs to select a role.
+ * 
+ * @param {Object} req - Express request object with role in body
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ */
+const updateOAuthRole = async (req, res, next) => {
+  try {
+    const { role } = req.body;
+
+    // Validate role
+    if (!role || (role !== 'candidate' && role !== 'recruiter')) {
+      return res.status(400).json({
+        success: false,
+        message: 'Valid role (candidate or recruiter) is required',
+      });
+    }
+
+    // Update user role
+    const User = require('../models/User');
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: { role } },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Role updated successfully',
+      data: {
+        user: updatedUser,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -205,5 +252,6 @@ module.exports = {
   updateProfile,
   getCandidateProfile,
   uploadResumeFile,
+  updateOAuthRole,
 };
 

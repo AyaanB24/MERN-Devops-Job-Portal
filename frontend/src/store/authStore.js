@@ -178,15 +178,22 @@ export const useAuthStore = create((set, get) => ({
         }
       })
 
-      // Update user with new resume path from response
-      if (response.data.data?.user) {
-        set({ user: response.data.data.user, isLoading: false })
+      console.log('Resume upload response:', response.data)
+
+      // Update user with resume from response
+      const updatedUser = response.data.data?.user
+      
+      if (updatedUser) {
+        console.log('Updated user with resume:', updatedUser.resume)
+        set({ user: updatedUser, isLoading: false })
       } else {
+        console.warn('No user data in resume upload response')
         set({ isLoading: false })
       }
       
       return response.data
     } catch (error) {
+      console.error('Resume upload error:', error)
       const errorMsg = error.response?.data?.message || 'Failed to upload resume'
       set({ error: errorMsg, isLoading: false })
       throw error
