@@ -31,6 +31,7 @@ const companySchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: [true, 'Company owner is required'],
+      unique: true, // Ensures 1 recruiter can only have 1 company
       index: true, // Optimizes lookup for companies owned by specific users
     },
   },

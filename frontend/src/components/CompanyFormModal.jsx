@@ -73,7 +73,13 @@ export default function CompanyFormModal({ company, onClose }) {
       onClose()
     } catch (error) {
       console.error('Error:', error.response?.data || error.message)
-      setError(error.response?.data?.message || 'Failed to save company')
+      const errorMessage = error.response?.data?.message || 'Failed to save company'
+      setError(errorMessage)
+      
+      // If the error is about already having a company, provide helpful instruction
+      if (errorMessage.includes('already have a company')) {
+        setError(errorMessage + '. Delete your existing company to create a new one.')
+      }
     }
   }
 

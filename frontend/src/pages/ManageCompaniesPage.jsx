@@ -51,17 +51,33 @@ export default function ManageCompaniesPage() {
               Manage Companies
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-2">
-              Create and manage your company profiles
+              {companies.length > 0 
+                ? 'You can have only one company. Edit or delete to manage.' 
+                : 'Create your company profile to post jobs'}
             </p>
           </div>
-          <button
-            onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors"
-          >
-            <Plus size={20} />
-            Add Company
-          </button>
+          {companies.length === 0 && (
+            <button
+              onClick={() => setShowForm(true)}
+              className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors"
+            >
+              <Plus size={20} />
+              Add Company
+            </button>
+          )}
         </div>
+
+        {/* 1-Company Limit Notice */}
+        {companies.length > 0 && (
+          <div className="mb-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <p className="text-blue-900 dark:text-blue-100 font-semibold">
+              📌 One Company Per Recruiter
+            </p>
+            <p className="text-blue-700 dark:text-blue-200 text-sm mt-1">
+              You are limited to managing one company. You can edit or delete this company, but cannot create additional ones. To create a new company, delete the existing one first.
+            </p>
+          </div>
+        )}
 
         {/* Companies Grid */}
         {isLoading ? (

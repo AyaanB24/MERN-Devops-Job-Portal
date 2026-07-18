@@ -3,6 +3,17 @@ const asyncHandler = require('../utils/asyncHandler');
 
 exports.createCompany = asyncHandler(async (req, res) => {
   const { companyName, description, website } = req.body;
+  
+  // Check if recruiter already has a company
+  const existingCompany = await Company.findOne({ owner: req.user.id });
+  if (existingCompany) {
+    return res.status(400).json({ 
+      success: false, 
+      message: 'You already have a company. A recruiter can only own one company.',
+      data: { existingCompany }
+    });
+  }
+  
   const company = await Company.create({
     companyName,
     description,

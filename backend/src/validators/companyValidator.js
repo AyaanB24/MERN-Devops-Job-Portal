@@ -1,20 +1,6 @@
-/**
- * @file companyValidator.js
- * @description Request validation middleware for company routes using
- * express-validator. Validates body fields before the controller runs.
- *
- * VALIDATION DECISIONS:
- * ─────────────────────
- *  companyName → Required, 2-100 chars. Prevents empty/single-char spam
- *                registrations and matches the schema's maxlength.
- *  website     → Optional, must be a valid URL when provided. Blocks
- *                freeform text like "google" that would break frontend links.
- *  description → Optional, max 1000 chars. Matches the schema limit; prevents
- *                oversized payloads from reaching the DB layer.
- */
-
 const { body } = require('express-validator');
 const { validate } = require('../middleware/validationMiddleware');
+const Company = require('../models/Company');
 
 // ─── Create Company Validation ────────────────────────────────────────────────
 
@@ -23,6 +9,7 @@ const { validate } = require('../middleware/validationMiddleware');
  *
  * Validates POST /api/companies body fields.
  * `owner` is set by the controller from req.user — never user-supplied.
+ * Also checks that recruiter doesn't already have a company.
  */
 const validateCreateCompany = [
   body('companyName')
