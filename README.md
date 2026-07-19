@@ -451,6 +451,5 @@ The application is fully functional and ready for:
 
 ---
 
-**Built with ❤️ using MERN Stack**
+**Built with ❤️ From Ayaan**
 
-Happy coding! 🎉
