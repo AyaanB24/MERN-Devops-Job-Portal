@@ -29,9 +29,15 @@ export default function ResumeViewer({ resumePath, candidateName = 'Candidate' }
     const link = document.createElement('a')
     link.href = resumeUrl
     link.download = `${candidateName}_Resume.pdf`
+    link.target = '_blank'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  }
+
+  const handleIframeError = () => {
+    setError('Resume file not accessible from server. Please use the download button.')
+    setIsLoading(false)
   }
 
   return (
@@ -98,10 +104,7 @@ export default function ResumeViewer({ resumePath, candidateName = 'Candidate' }
             src={`${resumeUrl}#toolbar=1&navpanes=0&scrollbar=1`}
             className="w-full h-full border-0"
             onLoad={() => setIsLoading(false)}
-            onError={() => {
-              setError('Could not load resume preview. Please download the file instead.')
-              setIsLoading(false)
-            }}
+            onError={handleIframeError}
             title={`${candidateName}'s Resume`}
           />
         )}

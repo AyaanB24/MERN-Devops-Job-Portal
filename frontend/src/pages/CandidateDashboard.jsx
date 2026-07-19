@@ -6,11 +6,15 @@ import { useAuthStore } from '../store/authStore'
 
 export default function CandidateDashboard() {
   const { applications, isLoading, fetchApplications } = useJobStore()
-  const { user } = useAuthStore()
+  const { user, getProfile } = useAuthStore()
   const [stats, setStats] = useState({ total: 0, accepted: 0, pending: 0, rejected: 0 })
 
   useEffect(() => {
     loadApplications()
+    // Fetch complete profile on mount to ensure profile data is loaded
+    getProfile().catch(() => {
+      // Silently fail - user is authenticated
+    })
   }, [])
 
   useEffect(() => {

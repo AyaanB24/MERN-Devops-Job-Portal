@@ -13,7 +13,19 @@ app.use(cors());
 
 // ── Static File Serving ───────────────────────────────────────────────────────
 // Serve uploaded files (resumes, etc.) from /uploads directory
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+// Handle 404s from static files gracefully without triggering error middleware
+app.use("/uploads", express.static(path.join(__dirname, "../uploads"), {
+  fallthrough: true,  // Don't throw error, just continue to next middleware
+  setHeaders: (res, path) => {
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+  }
+}), (req, res) => {
+  // If we reach here, the file wasn't found - send proper 404 response
+  res.status(404).json({
+    success: false,
+    message: `File not found: ${req.path}`
+  });
+});
 
 // ── Health Check ──────────────────────────────────────────────────────────────
 app.get("/", (req, res) => {

@@ -1,0 +1,18 @@
+node_modules
+
+.git
+.github
+
+.env
+
+tests
+Testing Files
+
+coverage
+
+uploads
+
+.vscode
+
+Dockerfile
+.dockerignore

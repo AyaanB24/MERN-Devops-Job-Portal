@@ -48,11 +48,24 @@ router.post('/profile/resume', protect, (req, res, next) => {
   // Wrap in a custom callback to intercept and format Multer validation errors
   uploadResume.single('resume')(req, res, (err) => {
     if (err) {
+      console.error('Resume upload error:', err.message)
       return res.status(400).json({
         success: false,
-        message: err.message,
+        message: err.message || 'Failed to upload resume',
+        data: null
       });
     }
+    
+    // Check if file was actually uploaded
+    if (!req.file) {
+      console.error('No file provided in upload request')
+      return res.status(400).json({
+        success: false,
+        message: 'No file provided. Please select a resume file.',
+        data: null
+      });
+    }
+    
     // Call the controller to save resume to database
     authController.uploadResumeFile(req, res, next);
   });

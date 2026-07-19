@@ -57,6 +57,14 @@ export default function RegisterPage() {
       
       console.log('Role extracted for redirect:', role);
       
+      // Fetch complete profile data (includes bio, skills, resume, etc.)
+      try {
+        await useAuthStore.getState().getProfile()
+      } catch (profileError) {
+        console.warn('Could not fetch complete profile, but user is authenticated:', profileError)
+        // User is still registered, continue to dashboard
+      }
+      
       // Redirect based on role
       if (role === 'recruiter') {
         console.log('✓ Redirecting to recruiter dashboard');
