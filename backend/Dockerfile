@@ -18,9 +18,6 @@ COPY --from=deps /app/node_modules ./node_modules
 
 COPY . .
 
-# Create uploads directory and copy existing uploads if they exist
-RUN mkdir -p /app/uploads/resumes && \
-    if [ -d "uploads" ]; then cp -r uploads/* /app/uploads/ 2>/dev/null || true; fi
 
 EXPOSE 5000
 
