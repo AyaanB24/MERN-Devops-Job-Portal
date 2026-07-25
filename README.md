@@ -418,4 +418,3 @@ docker-compose up --build
 
 **Version:** 1.0.0 (Containerized)  
 **Next Phase:** Jenkins CI/CD Pipeline  
-**For roadmap details:** See [pipeline_plan.md](./Docs/pipeline_plan.md)
