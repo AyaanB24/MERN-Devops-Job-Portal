@@ -1,0 +1,39 @@
+# Environment variables (SECRETS)
+backend/.env
+frontend/.env.local
+frontend/.env
+
+# Dependencies
+node_modules/
+*.lock
+package-lock.json
+yarn.lock
+
+# Build outputs
+dist/
+build/
+.next/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Docker
+.dockerignore
+
+# OS
+.env.local
+.env.*.local
