@@ -12,7 +12,7 @@ pipeline {
         stage('Backend Install') {
             steps {
                 dir('backend') {
-                    bat 'npm install'
+                    sh 'npm install'
                 }
             }
         }
@@ -20,7 +20,7 @@ pipeline {
         stage('Backend Test') {
             steps {
                 dir('backend') {
-                    bat 'npm test'
+                    sh 'npm test'
                 }
             }
         }
