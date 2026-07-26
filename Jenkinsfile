@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        sonarQubeScanner 'SonarScanner'
+    }
+
     stages {
 
         stage('Checkout') {
@@ -41,15 +45,38 @@ pipeline {
                 }
             }
         }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                    sonar-scanner \
+                    -Dsonar.projectKey=job-portal \
+                    -Dsonar.projectName="Job Portal" \
+                    -Dsonar.sources=. \
+                    -Dsonar.sourceEncoding=UTF-8
+                    '''
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
     }
 
     post {
         success {
-            echo 'Build completed successfully.'
+            echo 'Build and SonarQube analysis completed successfully.'
         }
 
         failure {
-            echo 'Build failed.'
+            echo 'Pipeline failed.'
         }
 
         always {
