@@ -1,0 +1,15 @@
+services:
+  dependency-check:
+    image: owasp/dependency-check:latest
+    container_name: dependency-check
+    volumes:
+      - dependency-check-data:/usr/share/dependency-check/data
+      - ../../:/src
+      - ./reports:/report
+    command: >
+      --scan /src
+      --out /report
+      --format HTML
+
+volumes:
+  dependency-check-data:
