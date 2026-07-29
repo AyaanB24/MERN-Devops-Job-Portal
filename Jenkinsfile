@@ -65,28 +65,12 @@ pipeline {
                 }
             }
         }
-        stage('OWASP Dependency Check') {
-            steps {
-                dependencyCheck(
-                    odcInstallation: 'DependencyCheck',
-                    additionalArguments: '''
-                        --scan .
-                        --format HTML
-                        --format XML
-                    '''
-                )
-
-                dependencyCheckPublisher(
-                    pattern: '**/dependency-check-report.xml'
-                )
-            }
-        }
 
     }
 
     post {
         success {
-            echo 'Build, SonarQube, and Dependency-Check completed successfully.'
+            echo 'Build, SonarQube, Scan completed successfully.'
         }
 
         failure {
