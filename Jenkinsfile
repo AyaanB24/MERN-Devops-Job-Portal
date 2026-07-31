@@ -58,6 +58,7 @@ pipeline {
                 }
             }
         }
+
         stage('Quality Gate') {
             steps {
                 timeout(time: 5, unit: 'MINUTES') {
@@ -66,11 +67,31 @@ pipeline {
             }
         }
 
+        stage('Build Backend Docker Image') {
+            steps {
+                sh '''
+                    docker build \
+                    -t jobportal-backend:latest \
+                    ./backend
+                '''
+            }
+        }
+
+        stage('Build Frontend Docker Image') {
+            steps {
+                sh '''
+                    docker build \
+                    -t jobportal-frontend:latest \
+                    ./frontend
+                '''
+            }
+        }
+
     }
 
     post {
         success {
-            echo 'Build, SonarQube, Scan completed successfully.'
+            echo 'Build, SonarQube and Docker image build completed successfully.'
         }
 
         failure {
