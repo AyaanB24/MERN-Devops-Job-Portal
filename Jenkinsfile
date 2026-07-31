@@ -86,12 +86,49 @@ pipeline {
                 '''
             }
         }
+        stage('Scan Backend Image') {
+            steps {
+                sh '''
+                mkdir -p reports
 
+                docker run --rm \
+                -v /var/run/docker.sock:/var/run/docker.sock \
+                -v $WORKSPACE/reports:/reports \
+                -v $WORKSPACE/DevOps/trivy/html.tpl:/tmp/html.tpl \
+                aquasec/trivy:latest image \
+                --severity HIGH,CRITICAL \
+                --exit-code 1 \
+                --format template \
+                --template "@/tmp/html.tpl" \
+                -o /reports/backend-trivy-report.html \
+                jobportal-backend:latest
+                '''
+            }
+        }
+        stage('Scan Frontend Image') {
+            steps {
+                sh '''
+                mkdir -p reports
+
+                docker run --rm \
+                -v /var/run/docker.sock:/var/run/docker.sock \
+                -v $WORKSPACE/reports:/reports \
+                -v $WORKSPACE/DevOps/trivy/html.tpl:/tmp/html.tpl \
+                aquasec/trivy:latest image \
+                --severity HIGH,CRITICAL \
+                --exit-code 1 \
+                --format template \
+                --template "@/tmp/html.tpl" \
+                -o /reports/frontend-trivy-report.html \
+                jobportal-frontend:latest
+                '''
+            }
+        }
     }
 
     post {
         success {
-            echo 'Build, SonarQube and Docker image build completed successfully.'
+            echo 'Build, SonarQube and Docker image build & genrated security completed successfully.'
         }
 
         failure {
@@ -99,6 +136,7 @@ pipeline {
         }
 
         always {
+            archiveArtifacts artifacts: 'reports/*.html', fingerprint: true
             cleanWs()
         }
     }
