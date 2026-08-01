@@ -137,8 +137,8 @@ pipeline {
         stage('Tag Docker Images') {
             steps {
                 sh '''
-                docker tag jobportal-backend:latest YOUR_DOCKERHUB_USERNAME/jobportal-backend:latest
-                docker tag jobportal-frontend:latest YOUR_DOCKERHUB_USERNAME/jobportal-frontend:latest
+                docker tag jobportal-backend:latest ayaanb2324/jobportal-backend:latest
+                docker tag jobportal-frontend:latest ayaanb2324/jobportal-frontend:latest
                 '''
             }
         }
@@ -146,7 +146,7 @@ pipeline {
         stage('Push Backend Image') {
             steps {
                 sh '''
-                docker push YOUR_DOCKERHUB_USERNAME/jobportal-backend:latest
+                docker push ayaanb2324/jobportal-backend:latest
                 '''
             }
         }
@@ -154,7 +154,7 @@ pipeline {
         stage('Push Frontend Image') {
             steps {
                 sh '''
-                docker push YOUR_DOCKERHUB_USERNAME/jobportal-frontend:latest
+                docker push ayaanb2324/jobportal-frontend:latest
                 '''
             }
         }
@@ -170,6 +170,8 @@ pipeline {
         }
 
         always {
+            sh 'docker logout || true'
+
             cleanWs()
         }
     }
