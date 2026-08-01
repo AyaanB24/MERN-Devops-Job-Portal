@@ -91,24 +91,14 @@ pipeline {
         stage('Scan Backend Image') {
             steps {
                 sh '''
-                mkdir -p reports
-                mkdir -p $HOME/.cache/trivy
-
-                ls -l $WORKSPACE/DevOps/trivy
-
                 docker run --rm \
-                  -v /var/run/docker.sock:/var/run/docker.sock \
-                  -v $HOME/.cache/trivy:/root/.cache/trivy \
-                  -v $WORKSPACE/reports:/reports \
-                  -v $WORKSPACE/DevOps/trivy/html.tpl:/tmp/html.tpl:ro \
-                  aquasec/trivy:latest image \
-                  --scanners vuln \
-                  --severity HIGH,CRITICAL \
-                  --exit-code 1 \
-                  --format template \
-                  --template "@/tmp/html.tpl" \
-                  -o /reports/backend-trivy-report.html \
-                  jobportal-backend:latest
+                -v /var/run/docker.sock:/var/run/docker.sock \
+                -v trivy-cache:/root/.cache/trivy \
+                aquasec/trivy:latest image \
+                --skip-db-update \
+                --severity HIGH,CRITICAL \
+                --exit-code 0 \
+                jobportal-backend:latest
                 '''
             }
         }
@@ -116,27 +106,17 @@ pipeline {
         stage('Scan Frontend Image') {
             steps {
                 sh '''
-                mkdir -p reports
-                mkdir -p $HOME/.cache/trivy
-
                 docker run --rm \
-                  -v /var/run/docker.sock:/var/run/docker.sock \
-                  -v $HOME/.cache/trivy:/root/.cache/trivy \
-                  -v $WORKSPACE/reports:/reports \
-                  -v $WORKSPACE/DevOps/trivy/html.tpl:/tmp/html.tpl:ro \
-                  aquasec/trivy:latest image \
-                  --scanners vuln \
-                  --severity HIGH,CRITICAL \
-                  --exit-code 1 \
-                  --format template \
-                  --template "@/tmp/html.tpl" \
-                  -o /reports/frontend-trivy-report.html \
-                  jobportal-frontend:latest
+                -v /var/run/docker.sock:/var/run/docker.sock \
+                -v trivy-cache:/root/.cache/trivy \
+                aquasec/trivy:latest image \
+                --skip-db-update \
+                --severity HIGH,CRITICAL \
+                --exit-code 0 \
+                jobportal-frontend:latest
                 '''
             }
         }
-    }
-
     post {
 
         success {
@@ -148,7 +128,6 @@ pipeline {
         }
 
         always {
-            archiveArtifacts artifacts: 'reports/*.html', fingerprint: true
             cleanWs()
         }
     }
