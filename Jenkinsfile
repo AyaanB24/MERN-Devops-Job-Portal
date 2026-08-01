@@ -92,13 +92,13 @@ pipeline {
             steps {
                 sh '''
                 docker run --rm \
-                -v /var/run/docker.sock:/var/run/docker.sock \
-                -v trivy-cache:/root/.cache/trivy \
-                aquasec/trivy:latest image \
-                --skip-db-update \
-                --severity HIGH,CRITICAL \
-                --exit-code 0 \
-                jobportal-backend:latest
+                  -v /var/run/docker.sock:/var/run/docker.sock \
+                  -v trivy-cache:/root/.cache/trivy \
+                  aquasec/trivy:latest image \
+                  --skip-db-update \
+                  --severity HIGH,CRITICAL \
+                  --exit-code 0 \
+                  jobportal-backend:latest
                 '''
             }
         }
@@ -107,16 +107,19 @@ pipeline {
             steps {
                 sh '''
                 docker run --rm \
-                -v /var/run/docker.sock:/var/run/docker.sock \
-                -v trivy-cache:/root/.cache/trivy \
-                aquasec/trivy:latest image \
-                --skip-db-update \
-                --severity HIGH,CRITICAL \
-                --exit-code 0 \
-                jobportal-frontend:latest
+                  -v /var/run/docker.sock:/var/run/docker.sock \
+                  -v trivy-cache:/root/.cache/trivy \
+                  aquasec/trivy:latest image \
+                  --skip-db-update \
+                  --severity HIGH,CRITICAL \
+                  --exit-code 0 \
+                  jobportal-frontend:latest
                 '''
             }
         }
+
+    }
+
     post {
 
         success {
