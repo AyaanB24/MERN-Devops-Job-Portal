@@ -161,18 +161,37 @@ pipeline {
     }
 
     post {
-        success {
-            echo 'Pipeline completed successfully.'
+
+    success {
+        withCredentials([string(credentialsId: 'slack-webhook', variable: 'SLACK_WEBHOOK')]) {
+            sh '''
+            curl -X POST -H "Content-type: application/json" \
+            --data "{
+                \\"text\\": \\"✅ *Pipeline Succeeded*\\nJob: ${JOB_NAME}\\nBuild: #${BUILD_NUMBER}\\n${BUILD_URL}\\"
+            }" \
+            $SLACK_WEBHOOK
+            '''
         }
 
-        failure {
-            echo 'Pipeline failed.'
-        }
-
-        always {
-            sh 'docker logout || true'
-
-            cleanWs()
-        }
+        echo 'Pipeline completed successfully.'
     }
+
+    failure {
+        withCredentials([string(credentialsId: 'slack-webhook', variable: 'SLACK_WEBHOOK')]) {
+            sh '''
+            curl -X POST -H "Content-type: application/json" \
+            --data "{
+                \\"text\\": \\"❌ *Pipeline Failed*\\nJob: ${JOB_NAME}\\nBuild: #${BUILD_NUMBER}\\n${BUILD_URL}\\"
+            }" \
+            $SLACK_WEBHOOK
+            '''
+        }
+
+        echo 'Pipeline failed.'
+    }
+
+    always {
+        cleanWs()
+    }
+}
 }
