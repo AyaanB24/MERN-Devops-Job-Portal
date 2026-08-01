@@ -118,50 +118,49 @@ pipeline {
             }
         }
 
-    }
-    stage('Docker Hub Login') {
-        steps {
-            withCredentials([usernamePassword(
-                credentialsId: 'dockerhub',
-                usernameVariable: 'DOCKER_USERNAME',
-                passwordVariable: 'DOCKER_PASSWORD'
-            )]) {
+        stage('Docker Hub Login') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'DOCKER_USERNAME',
+                    passwordVariable: 'DOCKER_PASSWORD'
+                )]) {
+                    sh '''
+                    echo "$DOCKER_PASSWORD" | docker login \
+                      -u "$DOCKER_USERNAME" \
+                      --password-stdin
+                    '''
+                }
+            }
+        }
+
+        stage('Tag Docker Images') {
+            steps {
                 sh '''
-                echo "$DOCKER_PASSWORD" | docker login \
-                -u "$DOCKER_USERNAME" \
-                --password-stdin
+                docker tag jobportal-backend:latest YOUR_DOCKERHUB_USERNAME/jobportal-backend:latest
+                docker tag jobportal-frontend:latest YOUR_DOCKERHUB_USERNAME/jobportal-frontend:latest
+                '''
+            }
+        }
+
+        stage('Push Backend Image') {
+            steps {
+                sh '''
+                docker push YOUR_DOCKERHUB_USERNAME/jobportal-backend:latest
+                '''
+            }
+        }
+
+        stage('Push Frontend Image') {
+            steps {
+                sh '''
+                docker push YOUR_DOCKERHUB_USERNAME/jobportal-frontend:latest
                 '''
             }
         }
     }
 
-    stage('Tag Docker Images') {
-        steps {
-            sh '''
-            docker tag jobportal-backend:latest YOUR_DOCKERHUB_USERNAME/jobportal-backend:latest
-            docker tag jobportal-frontend:latest YOUR_DOCKERHUB_USERNAME/jobportal-frontend:latest
-            '''
-        }
-    }
-
-    stage('Push Backend Image') {
-        steps {
-            sh '''
-            docker push YOUR_DOCKERHUB_USERNAME/jobportal-backend:latest
-            '''
-        }
-    }
-
-    stage('Push Frontend Image') {
-        steps {
-            sh '''
-            docker push YOUR_DOCKERHUB_USERNAME/jobportal-frontend:latest
-            '''
-        }
-    }
-
     post {
-
         success {
             echo 'Pipeline completed successfully.'
         }
