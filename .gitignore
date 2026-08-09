@@ -3,6 +3,8 @@ backend/.env
 frontend/.env.local
 frontend/.env
 
+secrets/backend-secret.yaml
+
 # Dependencies
 node_modules/
 *.lock
