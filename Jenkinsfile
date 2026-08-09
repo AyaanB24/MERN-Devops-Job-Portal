@@ -22,6 +22,14 @@ pipeline {
             }
         }
 
+        stage('Configure npm cache') {
+            steps {
+                sh '''
+                    npm config set cache /var/jenkins_home/.npm
+                '''
+            }
+        }
+
 
         // ============================================================
         // 2. BACKEND
@@ -30,7 +38,7 @@ pipeline {
         stage('Backend Install') {
             steps {
                 dir('backend') {
-                    sh 'npm install'
+                    sh 'npm ci --prefer-offline'
                 }
             }
         }
@@ -53,7 +61,7 @@ pipeline {
         stage('Frontend Install') {
             steps {
                 dir('frontend') {
-                    sh 'npm install'
+                    sh 'npm ci --prefer-offline'
                 }
             }
         }
@@ -85,7 +93,7 @@ pipeline {
                             -Dsonar.projectName=job-portal \
                             -Dsonar.sources=backend/src,frontend/src \
                             -Dsonar.sourceEncoding=UTF-8 \
-                            -Dsonar.javascript.node.maxspace=4096 \
+                            -Dsonar.javascript.node.maxspace=2048 \
                             -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/coverage/**,**/*.min.js
                         """
                     }

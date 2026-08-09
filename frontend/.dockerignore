@@ -6,3 +6,5 @@ dist
 .vscode
 Dockerfile
 .dockerignore
+npm-debug.log
+*.md
