@@ -84,7 +84,7 @@ pipeline {
                             -Dsonar.projectKey=job-portal \
                             -Dsonar.projectName=job-portal \
                             -Dsonar.sources=backend/src,frontend/src \
-                            -Dsonar.sourceEncoding=UTF-8
+                            -Dsonar.sourceEncoding=UTF-8 \
                             -Dsonar.javascript.node.maxspace=4096 \
                             -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/coverage/**,**/*.min.js
                         """
