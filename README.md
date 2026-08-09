@@ -417,4 +417,4 @@ docker-compose up --build
 ---
 
 **Version:** 1.0.0 (Containerized)  
-**Next Phase:** Docker Deployment & Slack Notification 
+**Next Phase:** AWS Deployment 
