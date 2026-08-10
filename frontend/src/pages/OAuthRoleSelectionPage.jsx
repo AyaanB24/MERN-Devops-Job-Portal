@@ -39,7 +39,7 @@ export default function OAuthRoleSelectionPage() {
     try {
       // Update user role in backend
       const response = await fetch(
-        'http://localhost:5000/api/auth/update-oauth-role',
+        '/api/auth/update-oauth-role',
         {
           method: 'PUT',
           headers: {

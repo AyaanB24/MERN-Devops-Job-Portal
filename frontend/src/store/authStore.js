@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import axios from 'axios'
 
-const API_BASE = 'http://localhost:5000/api'
+const API_BASE = '/api'
 
 // Initialize token at module level (not wrapped in IIFE)
 const storedToken = localStorage.getItem('token')

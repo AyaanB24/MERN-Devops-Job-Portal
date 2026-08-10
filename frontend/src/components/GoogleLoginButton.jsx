@@ -96,7 +96,7 @@ export default function GoogleLoginButton({
       const idToken = response.credential
 
       const backendResponse = await fetch(
-        'http://localhost:5000/api/oauth/verify-google-token',
+        '/api/oauth/verify-google-token',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

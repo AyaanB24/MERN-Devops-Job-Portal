@@ -45,7 +45,7 @@ export default function JobDetailPage() {
 
   const fetchCandidateApplication = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/applications?job=${id}`)
+      const response = await axios.get(`/api/applications?job=${id}`)
       const applications = response.data.data || []
       
       // Find application by current candidate - handle both object and string IDs

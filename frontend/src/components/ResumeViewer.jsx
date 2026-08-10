@@ -23,7 +23,7 @@ export default function ResumeViewer({ resumePath, candidateName = 'Candidate' }
   // Construct full URL for the resume
   const resumeUrl = resumePath.startsWith('http') 
     ? resumePath 
-    : `http://localhost:5000${resumePath}`
+    : `/api${resumePath}`
 
   const handleDownload = () => {
     const link = document.createElement('a')

@@ -50,7 +50,7 @@ export default function ApplicationDetailPage() {
       setError(null)
       
       // Fetch application details
-      const appResponse = await axios.get(`http://localhost:5000/api/applications`)
+      const appResponse = await axios.get(`/api/applications`)
       const applications = appResponse.data.data || []
       
       console.log('Applications fetched:', applications.length)
@@ -74,7 +74,7 @@ export default function ApplicationDetailPage() {
         try {
           const jobId = typeof foundApp.job === 'object' ? foundApp.job._id : foundApp.job
           console.log('Fetching job:', jobId)
-          const jobResponse = await axios.get(`http://localhost:5000/api/jobs/${jobId}`)
+          const jobResponse = await axios.get(`/api/jobs/${jobId}`)
           setJob(jobResponse.data.data)
           console.log('Job fetched successfully')
         } catch (err) {

@@ -21,7 +21,7 @@ export default function CandidateProfilePage() {
       setError(null)
       
       // Fetch candidate details using their ID
-      const response = await axios.get(`http://localhost:5000/api/auth/candidate/${candidateId}`)
+      const response = await axios.get(`/api/auth/candidate/${candidateId}`)
       
       if (response.data.success) {
         setCandidate(response.data.data)
