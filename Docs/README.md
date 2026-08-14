@@ -11,10 +11,10 @@
 [![Nginx](https://img.shields.io/badge/Nginx-Reverse%20Proxy-009639?style=for-the-badge&logo=nginx&logoColor=white)](#)
 
 [![Status](https://img.shields.io/badge/status-containerized%20%7C%20production--ready-brightgreen?style=flat-square)](#)
-[![Roadmap](https://img.shields.io/badge/roadmap-15%20phases%20to%20AWS%2FEKS-blue?style=flat-square)](#-devops-roadmap-15-phases)
+[![Next](https://img.shields.io/badge/next-AWS%20EKS%20deployment-orange?style=flat-square)](#-whats-next-aws-deployment)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square)](#)
 
-[Live Demo](#) · [Report Bug](https://github.com/AyaanB24/MERN-Devops-Job-Portal/issues) · [Architecture](#-architecture) · [Roadmap](#-devops-roadmap-15-phases)
+[Live Demo](#) · [Report Bug](https://github.com/AyaanB24/MERN-Devops-Job-Portal/issues) · [Architecture](#-architecture) · [What's Next](#-whats-next-aws-deployment)
 
 </div>
 
@@ -22,21 +22,18 @@
 
 ## 🎯 Why This Project
 
-Most portfolio projects stop at "it works on my machine." This one starts there and keeps going —
-from a 3-service Docker Compose stack today, to a Kubernetes-orchestrated, auto-scaling deployment on AWS EKS by the end of a documented 15-phase roadmap.
+Most portfolio projects stop at "it works on my machine." This one goes further — a real multi-tenant application, fully containerized, with the infrastructure decisions documented alongside the code.
 
 It's built to answer one recruiter question directly: **can this person ship *and* operate software?**
 
 - 🧩 A real multi-tenant application (candidates, recruiters, RBAC) — not a CRUD toy
 - 🐳 8x smaller container images via multi-stage Alpine builds
-- 📐 A documented path from local Docker Compose → CI/CD → Kubernetes → AWS
-- 🔐 Security and observability treated as first-class citizens, not an afterthought
+- 🔐 Auth, RBAC, and security treated as first-class citizens from day one
+- ☁️ Currently being extended into a Kubernetes/AWS deployment (see [What's Next](#-whats-next-aws-deployment))
 
 ---
 
 ## 🏗️ Architecture
-
-### Current: Docker Compose (Phase 0 — Live)
 
 ```mermaid
 flowchart TB
@@ -64,35 +61,6 @@ flowchart TB
 ```
 
 **Network:** all three services communicate over a shared bridge network (`jobportal-network`), with named volumes for MongoDB data and resume uploads persisting across container restarts.
-
-### Target: AWS EKS (Phase 15 — Roadmap)
-
-```mermaid
-flowchart TB
-    U["🌐 Internet Users"] --> R53["Route 53 (DNS)"]
-    R53 --> ACM["Certificate Manager (TLS)"]
-    ACM --> ALB["Application Load Balancer<br/>:443 / :80"]
-    ALB --> EKS["AWS EKS Cluster"]
-
-    EKS --> FP["Frontend Pods (3 replicas)<br/>nginx:alpine"]
-    EKS --> BP["Backend Pods (3–10 replicas)<br/>HPA scales at CPU > 70%"]
-
-    BP --> DDB[("AWS DocumentDB<br/>Multi-AZ · 3 nodes")]
-    BP --> S3[("AWS S3<br/>Resume Storage")]
-    BP --> PROM["Prometheus"]
-
-    PROM --> GRAF["Grafana Dashboards"]
-    PROM --> ALERT["AlertManager"]
-    ALERT --> SLACK["Slack #alerts"]
-
-    EKS --> CW["CloudWatch<br/>Logs & Alarms"]
-
-    style ALB fill:#FF9900,color:#000
-    style EKS fill:#FF9900,color:#000
-    style DDB fill:#3B48CC,color:#fff
-    style PROM fill:#E6522C,color:#fff
-    style GRAF fill:#F46800,color:#fff
-```
 
 ### Request Lifecycle
 
@@ -171,25 +139,18 @@ sequenceDiagram
 
 ---
 
-## 🗺️ DevOps Roadmap: 15 Phases
+## 🛠️ What I've Built So Far
 
-> **Local → CI/CD → Kubernetes → AWS.** Each phase is documented as it ships.
+- **Designed and built the full MERN stack from scratch** — Express REST API, React SPA, MongoDB schemas with Mongoose validation and cascading deletes
+- **Implemented JWT + Google OAuth 2.0 auth** with automatic role detection for new vs. returning users
+- **Enforced multi-tenancy at both the DB and API layer** — recruiters are hard-scoped to their own jobs and applicants
+- **Containerized the entire stack** with multi-stage Docker builds, cutting image sizes by 8x (Alpine base)
+- **Configured Nginx as a reverse proxy** — SPA routing with `try_files`, gzip compression, 1-year static asset caching, security headers
+- **Orchestrated a 3-service Docker Compose network** with named persistent volumes for MongoDB data and resume uploads
+- **Wired health/readiness endpoints** (`/health`, `/ready`) for load-balancer checks
+- **Audited dependencies and code for vulnerabilities** — zero critical issues at time of writing
 
-| Phase | Focus | Status |
-|---|---|---|
-| 0 | Docker Compose — 3-service local orchestration | ✅ **Complete** |
-| 1–2 | Code Quality — ESLint, Prettier, Jest (70% coverage), SonarQube Grade A | 📋 Next |
-| 3–4 | CI Pipeline — Jenkins, GitHub webhooks, automated lint & test | 📋 Planned |
-| 5–6 | Security Scanning — npm audit, OWASP Dependency-Check, Trivy | 📋 Planned |
-| 7 | Artifact Management — Docker Hub registry, semantic versioning | 📋 Planned |
-| 8 | CD Pipeline — staging auto-deploy, manual approval, rollback | 📋 Planned |
-| 9–10 | Kubernetes — manifests, deployments, services, ingress, HPA | 📋 Planned |
-| 11 | GitOps — ArgoCD, Git-driven auto-sync deployments | 📋 Planned |
-| 12–13 | Observability — Prometheus, Grafana, AlertManager | 📋 Planned |
-| 14 | Hardening — Helmet.js, rate limiting, network policies | 📋 Planned |
-| 15 | AWS Deployment — EKS, Route53, ACM, S3, DocumentDB, CloudWatch | 📋 Planned |
-
-📄 Full detail: [`Docs/pipeline_plan.md`](./Docs/pipeline_plan.md)
+📄 Build notes & issues faced: [`Docs/CONTAINERIZATION.md`](./Docs/CONTAINERIZATION.md), [`Docs/NGINX.md`](./Docs/NGINX.md)
 
 ---
 
@@ -265,6 +226,43 @@ docker-compose up --build
 
 ---
 
+## ☁️ What's Next: AWS Deployment
+
+The current Docker Compose setup runs and demos well locally — the next milestone is taking it to production on **AWS EKS** with CI/CD, observability, and auto-scaling built in.
+
+```mermaid
+flowchart TB
+    U["🌐 Internet Users"] --> R53["Route 53 (DNS)"]
+    R53 --> ACM["Certificate Manager (TLS)"]
+    ACM --> ALB["Application Load Balancer<br/>:443 / :80"]
+    ALB --> EKS["AWS EKS Cluster"]
+
+    EKS --> FP["Frontend Pods (3 replicas)<br/>nginx:alpine"]
+    EKS --> BP["Backend Pods (3–10 replicas)<br/>HPA scales at CPU > 70%"]
+
+    BP --> DDB[("AWS DocumentDB<br/>Multi-AZ · 3 nodes")]
+    BP --> S3[("AWS S3<br/>Resume Storage")]
+    BP --> PROM["Prometheus"]
+
+    PROM --> GRAF["Grafana Dashboards"]
+    PROM --> ALERT["AlertManager"]
+    ALERT --> SLACK["Slack #alerts"]
+
+    EKS --> CW["CloudWatch<br/>Logs & Alarms"]
+
+    style ALB fill:#FF9900,color:#000
+    style EKS fill:#FF9900,color:#000
+    style DDB fill:#3B48CC,color:#fff
+    style PROM fill:#E6522C,color:#fff
+    style GRAF fill:#F46800,color:#fff
+```
+
+**Planned pipeline:** Jenkins CI → Trivy/OWASP security scans → Docker Hub registry → Kubernetes manifests (deployments, services, ingress, HPA) → ArgoCD GitOps sync → Prometheus/Grafana observability → deploy to EKS behind an ALB, with Route 53 + ACM for DNS/TLS and CloudWatch for centralized logging and alarms.
+
+📄 Full plan: [`Docs/pipeline_plan.md`](./Docs/pipeline_plan.md)
+
+---
+
 <div align="center">
 
 ### 👤 Author
@@ -275,6 +273,6 @@ docker-compose up --build
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/ayaan-bargir-13b684311)
 [![Email](https://img.shields.io/badge/Email-Contact-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:ayaanbargir7@gmail.com)
 
-*Currently shipping Phase 1–2: automated testing & code quality gates.*
+*Currently working on the AWS EKS deployment pipeline.*
 
 </div>
