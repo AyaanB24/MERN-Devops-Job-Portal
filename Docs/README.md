@@ -273,6 +273,4 @@ flowchart TB
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/ayaan-bargir-13b684311)
 [![Email](https://img.shields.io/badge/Email-Contact-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:ayaanbargir7@gmail.com)
 
-*Currently working on the AWS EKS deployment pipeline.*
-
 </div>
