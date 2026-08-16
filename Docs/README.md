@@ -14,7 +14,6 @@
 [![Next](https://img.shields.io/badge/next-AWS%20EKS%20deployment-orange?style=flat-square)](#-whats-next-aws-deployment)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square)](#)
 
-[Live Demo](#) · [Report Bug](https://github.com/AyaanB24/MERN-Devops-Job-Portal/issues) · [Architecture](#-architecture) · [What's Next](#-whats-next-aws-deployment)
 
 </div>
 
