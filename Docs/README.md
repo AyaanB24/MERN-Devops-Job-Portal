@@ -19,19 +19,6 @@
 
 ---
 
-## 🎯 Why This Project
-
-Most portfolio projects stop at "it works on my machine." This one goes further — a real multi-tenant application, fully containerized, with the infrastructure decisions documented alongside the code.
-
-It's built to answer one recruiter question directly: **can this person ship *and* operate software?**
-
-- 🧩 A real multi-tenant application (candidates, recruiters, RBAC) — not a CRUD toy
-- 🐳 8x smaller container images via multi-stage Alpine builds
-- 🔐 Auth, RBAC, and security treated as first-class citizens from day one
-- ☁️ Currently being extended into a Kubernetes/AWS deployment (see [What's Next](#-whats-next-aws-deployment))
-
----
-
 ## 🏗️ Architecture
 
 ```mermaid
