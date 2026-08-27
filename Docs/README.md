@@ -6,7 +6,6 @@
 
 A complete end-to-end DevOps implementation of a MERN Job Portal — from application development and containerization to automated security scanning, Kubernetes deployment, GitOps-based delivery, auto-scaling, load testing, and monitoring.
 
-**Project Status: COMPLETED**
 
 [![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker&logoColor=white)](#)
 [![Jenkins](https://img.shields.io/badge/Jenkins-CI%2FCD-D24939?style=for-the-badge&logo=jenkins&logoColor=white)](#)
@@ -450,12 +449,6 @@ The final result is a containerized, continuously integrated, security-scanned, 
 Docker containerization, multi-stage builds, Docker networking, Jenkins CI/CD, CI pipeline design, SonarQube, Quality Gates, Trivy, OWASP Dependency-Check, Docker Hub, GitOps, Argo CD, Kubernetes Deployments/Services/Ingress/StatefulSets, Persistent Volumes, Horizontal Pod Autoscaling, Kubernetes self-healing, k6 load testing, Prometheus, Grafana, Slack CI/CD notifications, infrastructure troubleshooting, failure and scalability testing.
  
 ---
- 
-## Project Status
- 
-**COMPLETED**
- 
-Application · Containerization · CI/CD · DevSecOps · Docker Registry · GitOps · Argo CD · Kubernetes · Ingress · HPA · Load Testing · Prometheus · Grafana
  
 --- 
 ## License
