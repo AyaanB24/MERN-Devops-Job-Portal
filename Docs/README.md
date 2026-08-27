@@ -1,40 +1,63 @@
-
-The final result is a **containerized, continuously integrated, security-scanned, GitOps-deployed, Kubernetes-orchestrated, auto-scaled, and monitored MERN application.**
-
----
-
-## Key DevOps Skills Demonstrated
-
-Docker containerization · Multi-stage builds · Docker networking · Jenkins CI/CD · CI pipeline design · SonarQube · Quality Gates · Trivy · OWASP Dependency-Check · Docker Hub · GitOps · Argo CD · Kubernetes Deployments, Services, Ingress, StatefulSets · Persistent Volumes · Horizontal Pod Autoscaling · Kubernetes self-healing · k6 load testing · Prometheus · Grafana · Slack CI/CD notifications · Infrastructure troubleshooting · Failure and scalability testing
-
----
-
-## Project Status
-
 <div align="center">
 
-### COMPLETED
+# MERN DevOps Job Portal
 
-**Application · Containerization · CI/CD · DevSecOps · Docker Registry · GitOps · Argo CD · Kubernetes · Ingress · HPA · Load Testing · Prometheus · Grafana**
+### Production-Grade MERN Application with CI/CD, DevSecOps, GitOps, Kubernetes, Auto Scaling & Observability
+
+A complete end-to-end DevOps implementation of a MERN Job Portal — from application development and containerization to automated security scanning, Kubernetes deployment, GitOps-based delivery, auto-scaling, load testing, and monitoring.
+
+**Project Status: COMPLETED**
+
+[![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker&logoColor=white)](#)
+[![Jenkins](https://img.shields.io/badge/Jenkins-CI%2FCD-D24939?style=for-the-badge&logo=jenkins&logoColor=white)](#)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-Orchestrated-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)](#)
+[![Argo CD](https://img.shields.io/badge/Argo%20CD-GitOps-EF7B4D?style=for-the-badge&logo=argo&logoColor=white)](#)
+[![Prometheus](https://img.shields.io/badge/Prometheus-Monitoring-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)](#)
+[![Grafana](https://img.shields.io/badge/Grafana-Dashboards-F46800?style=for-the-badge&logo=grafana&logoColor=white)](#)
 
 </div>
 
 ---
 
-## Author
+## Overview
 
-<div align="center">
+This project is a full-stack MERN Job Portal built and deployed using a production-oriented DevOps workflow.
 
-### Ayaan Bargir
-**DevOps / Backend Engineer**
+The objective was not only to build a functional web application, but to implement the complete software delivery lifecycle — from code to a monitored, auto-scaling Kubernetes deployment:
 
-[![GitHub](https://img.shields.io/badge/GitHub-AyaanB24-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AyaanB24)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/ayaan-bargir-13b684311)
 
-</div>
+### 2. Jenkins CI/CD Pipeline
 
----
+```mermaid
+flowchart LR
+    G["Git Push"] --> J["Jenkins"]
+    J --> BI["Backend Install"]
+    J --> BB["Backend Build"]
+    J --> FI["Frontend Install"]
+    J --> FB["Frontend Build"]
+    BI --> S["SonarQube"]
+    BB --> S
+    FI --> S
+    FB --> S
+    S --> T["Trivy Scan"]
+    T --> O["OWASP Dependency Check"]
+    O --> DB["Docker Build"]
+    DB --> DH["Docker Hub"]
+    DH --> GP["Update GitOps Repository"]
+    GP --> A["Argo CD"]
+    A --> K["Kubernetes"]
+```
 
-## License
+**Pipeline stages:** source checkout → backend install/build → frontend install/build → SonarQube analysis → Quality Gate → Trivy scan → OWASP Dependency-Check → Docker image build → Docker Hub push → GitOps manifest update → Slack notification.
 
-This project is licensed under the MIT License.
+### 3. DevSecOps
+
+Security is integrated directly into the CI pipeline rather than treated as a separate manual step.
+
+- **SonarQube** — code quality, bugs, code smells, maintainability, Quality Gate validation
+- **Trivy** — OS, package, and application dependency vulnerability scanning on container images
+- **OWASP Dependency-Check** — vulnerable third-party dependency detection
+
+### 4. Docker Image Registry
+
+Images are versioned by Jenkins build number for traceability between a build and its deployed version:
