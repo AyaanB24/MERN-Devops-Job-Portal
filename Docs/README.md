@@ -1,6 +1,6 @@
 <div align="center">
 
-# MERN DevOps Job Portal
+# DevOps Job Portal
 
 ### Production-Grade MERN Application with CI/CD, DevSecOps, GitOps, Kubernetes, Auto Scaling & Observability
 
