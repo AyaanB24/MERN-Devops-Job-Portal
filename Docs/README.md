@@ -366,6 +366,15 @@ MERN-Devops-Job-Portal/
 ```
  
 ---
+
+## Related Repositories
+
+| Repository | Purpose |
+|---|---|
+| [MERN-Devops-Job-Portal](https://github.com/AyaanB24/MERN-Devops-Job-Portal) | Application source code + Jenkinsfile (this repo) |
+| [jobportal-gitops](https://github.com/AyaanB24/jobportal-gitops) | Kubernetes manifests tracked by Argo CD (deployment source of truth) |
+
+Jenkins builds and pushes the image from this repo, then updates the manifests in `jobportal-gitops`. Argo CD watches that repo and syncs changes to the cluster — this repo never deploys directly.
  
 ## Local Development
  
