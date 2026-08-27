@@ -449,8 +449,6 @@ The final result is a containerized, continuously integrated, security-scanned, 
 Docker containerization, multi-stage builds, Docker networking, Jenkins CI/CD, CI pipeline design, SonarQube, Quality Gates, Trivy, OWASP Dependency-Check, Docker Hub, GitOps, Argo CD, Kubernetes Deployments/Services/Ingress/StatefulSets, Persistent Volumes, Horizontal Pod Autoscaling, Kubernetes self-healing, k6 load testing, Prometheus, Grafana, Slack CI/CD notifications, infrastructure troubleshooting, failure and scalability testing.
  
 ---
- 
---- 
 ## License
 MIT 
  
