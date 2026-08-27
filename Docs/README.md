@@ -448,18 +448,7 @@ Docker containerization, multi-stage builds, Docker networking, Jenkins CI/CD, C
  
 Application · Containerization · CI/CD · DevSecOps · Docker Registry · GitOps · Argo CD · Kubernetes · Ingress · HPA · Load Testing · Prometheus · Grafana
  
----
- 
-## Author
- 
-**Ayaan Bargir**
-DevOps / Backend Engineer
- 
-- GitHub: [AyaanB24](https://github.com/AyaanB24)
-- LinkedIn: [ayaan-bargir-13b684311](https://linkedin.com/in/ayaan-bargir-13b684311)
----
- 
+--- 
 ## License
- 
-This project is licensed under the MIT License.
+MIT 
  
